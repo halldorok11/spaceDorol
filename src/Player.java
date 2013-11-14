@@ -3,13 +3,22 @@
 import com.badlogic.gdx.graphics.GL11;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g3d.model.Model;
 
 public class Player
 {
+    //Position
 	Point3D eye;
 	Vector3D u;
 	Vector3D v;
 	Vector3D n;
+    float x_angle = 0;
+    float y_angle = 0;
+    float z_angle = 0;
+    float angle = 0;
+    float x_rotation = 0;
+    float y_rotation = 0;
+    float z_rotation = 0;
 
     //Speed related:
     Vector3D speed;
@@ -17,7 +26,9 @@ public class Player
 
     Sector currentSector;
 
-	public Player(Point3D pEye, Point3D pCenter, Vector3D up) {
+    Spaceship ship;
+
+	public Player(Point3D pEye, Point3D pCenter, Vector3D up, Spaceship ship) {
 		eye = pEye;
 		n = Vector3D.difference(pEye, pCenter);
 		n.normalize();
@@ -26,6 +37,7 @@ public class Player
 		v = Vector3D.cross(n, u);
 
         speed = new Vector3D(0,0,0);
+        this.ship = ship;
 	}
 	
 	public void setModelViewMatrix() {
@@ -76,5 +88,13 @@ public class Player
 
     public void update(){
         eye.add(speed);
+        angle = x_angle + y_angle + z_angle;
+        x_rotation = angle/x_angle;
+        y_rotation = angle/y_angle;
+        z_rotation = angle/z_angle;
+    }
+
+    public void draw(){
+
     }
 }

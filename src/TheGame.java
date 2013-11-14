@@ -94,13 +94,13 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         Gdx.gl11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
 
-        //camera
-        p1 = new Player(new Point3D(0.0f, 3.0f, 2.0f), new Point3D(2.0f, 3.0f, 3.0f), new Vector3D(0.0f, 1.0f, 0.0f));
-
         //assign images to the textures
         projectileTexture = new Texture("graphics/water.jpg");
         starTexture = new Texture("graphics/white.jpg");
         shuttleTexture = new Texture("graphics/cruiser/Textures/cruiser.png");
+
+        //camera
+        p1 = new Player(new Point3D(0.0f, 3.0f, 2.0f), new Point3D(2.0f, 3.0f, 3.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
 
         initialize();
         shuttle();
@@ -405,8 +405,6 @@ public class TheGame implements ApplicationListener, InputProcessor
         Point3D pos = new Point3D(p1.eye.x, p1.eye.y, p1.eye.z);
 
 
-
-        float pi = 3.1415f;
         Gdx.gl10.glPushMatrix();
         //Gdx.gl10.glTranslatef(p1.eye.x, p1.eye.y - 1, p1.eye.z);
         Gdx.gl10.glTranslatef(50000, 50000,50000);
