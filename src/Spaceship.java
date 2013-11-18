@@ -1,5 +1,5 @@
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g3d.model.Model;
+import com.badlogic.gdx.graphics.g3d.Model;
 
 public class Spaceship {
     Model model;

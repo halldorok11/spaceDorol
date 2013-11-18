@@ -1,4 +1,5 @@
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.ModelLoader;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -7,12 +8,12 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.g3d.AnimatedModelInstance;
-import com.badlogic.gdx.graphics.g3d.StillModelInstance;
-import com.badlogic.gdx.graphics.g3d.loaders.wavefront.ObjLoader;
-import com.badlogic.gdx.graphics.g3d.materials.Material;
-import com.badlogic.gdx.graphics.g3d.model.Model;
-import com.badlogic.gdx.graphics.g3d.model.still.StillModel;
+
+import com.badlogic.gdx.graphics.g3d.Model;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.ModelInstance;
+import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
+import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
@@ -55,8 +56,11 @@ public class TheGame implements ApplicationListener, InputProcessor
 
     //3D objects
     private Sector[][][] sectors;
-    private StillModel shuttle;
-    private StillModel planet;
+    private Model shuttle;
+    private Model planet;
+	private Array<ModelInstance> instances = new Array<ModelInstance>();
+	private ModelBatch modelBatch;
+	private ModelLoader loader;
 
     //Different textures for different 3D objects
     private Texture projectileTexture;
@@ -64,8 +68,9 @@ public class TheGame implements ApplicationListener, InputProcessor
     private Texture shuttleTexture;
     private Texture planetTexture;
 
-    //probably temp
-    ObjLoader loader;
+	//Camera stuff
+	private PerspectiveCamera cam;
+	private CameraInputController cameraInputController;
 
     @Override
     /**
@@ -76,6 +81,19 @@ public class TheGame implements ApplicationListener, InputProcessor
         //second camera used to print text on the screen
         this.secondCamera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         this.spriteBatch = new SpriteBatch();
+	    this.modelBatch = new ModelBatch();
+
+	    cam = new PerspectiveCamera(90, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+	    cam.position.set(1f,1f,1f);
+	    cam.lookAt(0, 0, 0);
+	    cam.near = 0.5f;
+	    cam.far = sectorSize;
+	    cam.update();
+
+	    cameraInputController = new CameraInputController(cam);
+	    Gdx.input.setInputProcessor(cameraInputController);
+
+
         this.font = new BitmapFont();
 
         //handles keyboard input
@@ -112,13 +130,19 @@ public class TheGame implements ApplicationListener, InputProcessor
         FileHandle in;
 
         if (shuttle == null) {
-            in = new FileHandle(Gdx.files.internal("graphics/cruiser/cruiser.obj").path());
-            shuttle = loader.loadObj(in, true);
+	        shuttle = loader.loadModel(Gdx.files.internal("graphics/cruiser/cruiser.obj"));
+	        ModelInstance shuttleInstance = new ModelInstance(shuttle);
+	        instances.add(shuttleInstance);
+            //in = new FileHandle(Gdx.files.internal("graphics/cruiser/cruiser.obj").path());
+            //shuttle = loader.loadObj(in, true);
         }
 
         if (planet == null) {
-            in = new FileHandle(Gdx.files.internal("graphics/Moon/blendermoon.obj").path());
-            planet = loader.loadObj(in,true);
+	        planet = loader.loadModel(Gdx.files.internal("graphics/Moon/blendermoon.obj"));
+	        ModelInstance planetInstance = new ModelInstance(planet);
+	        instances.add(planetInstance);
+	        //in = new FileHandle(Gdx.files.internal("graphics/Moon/blendermoon.obj").path());
+            //planet = loader.loadObj(in,true);
         }
     }
 
@@ -357,7 +381,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         Gdx.gl11.glMatrixMode(GL11.GL_PROJECTION);
         Gdx.gl11.glLoadIdentity();
-        Gdx.glu.gluPerspective(Gdx.gl11, 90, 1.3333f, 0.5f, sectorSize);
+        //Gdx.glu.gluPerspective(Gdx.gl11, 90, 1.3333f, 0.5f, sectorSize);
 
         Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
 
@@ -419,8 +443,10 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         //Gdx.gl10.glRotatef(180,0,0,0);
         Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
+	    modelBatch.begin(cam);
         shuttleTexture.bind();
-        shuttle.render();
+        modelBatch.render(instances);
+	    modelBatch.end();
         Gdx.gl10.glPopMatrix();
 
     }
