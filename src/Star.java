@@ -23,9 +23,9 @@ public class Star{
     public void draw(){
         Gdx.gl10.glPushMatrix();
         Gdx.gl10.glTranslatef(x, y,z);
-        Gdx.gl10.glScalef(0.1f,0.1f,0.1f);
+        Gdx.gl10.glScalef(size,size,size);
         Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-        tex.bind();
+        //tex.bind();
         model.render();
         Gdx.gl10.glPopMatrix();
     }

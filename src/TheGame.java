@@ -119,7 +119,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
 
         if (planet == null) {
-            in = new FileHandle(Gdx.files.internal("graphics/Moon_3D_Model/moon.g3db").path());
+            in = new FileHandle(Gdx.files.internal("graphics/Moon/moon.obj").path());
             planet = loader.loadObj(in,true);
         }
     }
