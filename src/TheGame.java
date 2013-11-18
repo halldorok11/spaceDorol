@@ -93,6 +93,8 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glLoadIdentity();
 
         Gdx.gl11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+        Gdx.gl11.glEnable(GL11.GL_TEXTURE_2D);
+        Gdx.gl11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
         //assign images to the textures
         projectileTexture = new Texture("graphics/water.jpg");
@@ -117,7 +119,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
 
         if (planet == null) {
-            in = new FileHandle(Gdx.files.internal("graphics/Moon/blendermoon.obj").path());
+            in = new FileHandle(Gdx.files.internal("graphics/Moon_3D_Model/moon.g3db").path());
             planet = loader.loadObj(in,true);
         }
     }
@@ -127,7 +129,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         int i = numberOfSectors/2;
 
-        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector,planetTexture);
+        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector,planetTexture, planet);
         generateSector(sectors[i][i][i]);
 
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
@@ -166,7 +168,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (x > 0 && y > 0 && z > 0){
             if (x < numberOfSectors-1 && y < numberOfSectors-1 && z < numberOfSectors-1){
                 if (sectors[x][y][z] == null){
-                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector, planetTexture);
+                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector, planetTexture, planet);
                 }
             }
         }
@@ -368,10 +370,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         float[] lightPosition0 = {p1.eye.x , p1.eye.y, p1.eye.z, 1.0f};
         Gdx.gl11.glLightfv(GL11.GL_LIGHT0, GL11.GL_POSITION, lightPosition0, 0);
 
-        // Set material on the cubes.
-        float[] cubeMaterialDiffuse;
-        cubeMaterialDiffuse = new float[]{1f, 1f, 1f, 1.0f};
-        Gdx.gl11.glMaterialfv(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT, cubeMaterialDiffuse, 0);
+        // Set material on all the things.
+        float[] materialDiffuse;
+        materialDiffuse = new float[]{1f, 1f, 1f, 1.0f};
+        Gdx.gl11.glMaterialfv(GL11.GL_FRONT_AND_BACK, GL11.GL_AMBIENT, materialDiffuse, 0);
 
         drawEnvironment();
 
