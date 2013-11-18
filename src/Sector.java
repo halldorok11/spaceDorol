@@ -1,4 +1,5 @@
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g3d.model.still.StillModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +13,9 @@ public class Sector {
     private List<Star> stars;
     private Random rand;
     private Texture tex;
+    private StillModel model;
 
-    public Sector(int x, int y, int z,int size,int nr_of_stars, Texture tex){
+    public Sector(int x, int y, int z,int size,int nr_of_stars, Texture tex, StillModel model){
         this.x = x;
         this.y = y;
         this.z = z;
@@ -21,12 +23,13 @@ public class Sector {
         this.tex = tex;
         rand = new Random();
         generateStars(nr_of_stars);
+        this.model = model;
     }
 
     private void generateStars(int nr_of_stars){
         stars = new ArrayList<Star>();
         for (int i = 0; i < nr_of_stars; i++){
-            stars.add(new Star(rand.nextFloat()*size + x, rand.nextFloat()*size + y, rand.nextFloat()*size + z, 5f, tex));
+            stars.add(new Star(rand.nextFloat()*size + x, rand.nextFloat()*size + y, rand.nextFloat()*size + z, 5f, tex, model));
         }
     }
 
