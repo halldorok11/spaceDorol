@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 
@@ -84,7 +85,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    this.modelBatch = new ModelBatch();
 
 	    cam = new PerspectiveCamera(90, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-	    cam.position.set(1f,1f,1f);
+	    cam.position.set(50000f,50000f,50000f);
 	    cam.lookAt(0, 0, 0);
 	    cam.near = 0.5f;
 	    cam.far = sectorSize;
@@ -422,6 +423,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         font.draw(this.spriteBatch, String.format("Frames per second: %d", Gdx.graphics.getFramesPerSecond()), -400, -340);
         font.draw(this.spriteBatch, String.format("p1.n: (%f,%f,%f)", v.x,v.y,v.z), -400, -360);
         this.spriteBatch.end();
+
 
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
     }
