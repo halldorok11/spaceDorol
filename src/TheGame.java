@@ -113,13 +113,12 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         if (shuttle == null) {
             in = new FileHandle(Gdx.files.internal("graphics/cruiser/cruiser.obj").path());
-            shuttle = loader.loadObj(in, false);
+            shuttle = loader.loadObj(in, true);
         }
 
         if (planet == null) {
-            //in = new FileHandle(Gdx.files.internal("graphics/AlienPlanet/AlienPlanet.obj").path());
             in = new FileHandle(Gdx.files.internal("graphics/Moon/blendermoon.obj").path());
-            planet = loader.loadObj(in,false);
+            planet = loader.loadObj(in,true);
         }
     }
 
@@ -128,7 +127,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         int i = numberOfSectors/2;
 
-        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector,starTexture, planet);
+        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector,planetTexture);
         generateSector(sectors[i][i][i]);
 
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
@@ -167,7 +166,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (x > 0 && y > 0 && z > 0){
             if (x < numberOfSectors-1 && y < numberOfSectors-1 && z < numberOfSectors-1){
                 if (sectors[x][y][z] == null){
-                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector, starTexture, planet);
+                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector, planetTexture);
                 }
             }
         }
