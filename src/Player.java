@@ -29,9 +29,9 @@ public class Player
 
     Spaceship ship;
 
-	public Player(Point3D pEye, Point3D pCenter, Vector3D up, Spaceship ship) {
+	public Player(Point3D pEye, Point3D pLookat, Vector3D up, Spaceship ship) {
 		eye = pEye;
-		n = Vector3D.difference(pEye, pCenter);
+		n = Vector3D.difference(pEye, pLookat);
 		n.normalize();
 		u = Vector3D.cross(up, n);
 		u.normalize();
@@ -52,18 +52,6 @@ public class Player
 		
 		Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
 		Gdx.gl11.glLoadMatrixf(matrix, 0);
-
-		Gdx.gl10.glPushMatrix();
-		//Gdx.gl10.glTranslatef(p1.eye.x + 8, p1.eye.y + 8, p1.eye.z + 8);
-		Gdx.gl10.glTranslatef(eye.x + 8, eye.y + 8 ,eye.z + 8);
-		//Vector3D v = Vector3D.sum(p1.n, Vector3D.sum(p1.u, p1.v)); //reverse n
-		//v.normalize();
-
-		//Gdx.gl10.glRotatef(180,0,0,0);
-		Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-		ship.tex.bind();
-		ship.model.render();
-		Gdx.gl10.glPopMatrix();
 	}
 	
 	public void slide(float delU, float delV, float delN) {
@@ -108,6 +96,13 @@ public class Player
     }
 
     public void draw(){
-
+        Gdx.gl10.glPushMatrix();
+        //Gdx.gl10.glTranslatef(eye.x, eye.y ,eye.z);
+        Gdx.gl10.glTranslatef(50000, 50000 ,50000);
+        Gdx.gl10.glRotatef(angle,x_rotation,y_rotation,z_rotation);
+        Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
+        ship.tex.bind();
+        ship.model.render();
+        Gdx.gl10.glPopMatrix();
     }
 }

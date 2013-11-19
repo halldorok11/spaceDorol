@@ -105,7 +105,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    loadModels();
 
         //camera
-        p1 = new Player(new Point3D(0.0f, 3.0f, 2.0f), new Point3D(2.0f, 3.0f, 3.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
+        p1 = new Player(new Point3D(0.0f, 0.0f, 0.0f), new Point3D(-2.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
         initialize();
     }
 
@@ -353,8 +353,6 @@ public class TheGame implements ApplicationListener, InputProcessor
     private void display() {
         Gdx.gl11.glClearColor(0f, 0f, 0f, 1.0f);
         Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-
-
         p1.setModelViewMatrix();
 
         Gdx.gl11.glMatrixMode(GL11.GL_PROJECTION);
@@ -377,7 +375,9 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         drawEnvironment();
 
-        drawShuttles();
+        //drawShuttles();
+
+        p1.draw();
 
         //Write the text on the screen:
 
@@ -387,7 +387,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         this.spriteBatch.setProjectionMatrix(this.secondCamera.combined);
         secondCamera.update();
 
-        Vector3D v = Vector3D.sum(p1.n,new Vector3D(0,0,0)); //reverse n
+        Vector3D v = Vector3D.sum(p1.n,new Vector3D(0,0,0)); //n
         v.normalize();
 
         this.spriteBatch.begin();
@@ -414,12 +414,11 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 
         Gdx.gl10.glPushMatrix();
-        //Gdx.gl10.glTranslatef(p1.eye.x + 8, p1.eye.y + 8, p1.eye.z + 8);
         Gdx.gl10.glTranslatef(50000, 50000,50000);
-        Vector3D v = Vector3D.sum(p1.n, Vector3D.sum(p1.u, p1.v)); //reverse n
+        Vector3D v = Vector3D.sum(p1.n,new Vector3D(0,0,0)); //n
         v.normalize();
 
-        //Gdx.gl10.glRotatef(180,0,0,0);
+        Gdx.gl10.glRotatef(180,0,0,0);
         Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
         shuttleTexture.bind();
         shuttle.render();
