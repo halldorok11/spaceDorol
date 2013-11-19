@@ -1,3 +1,4 @@
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
@@ -32,7 +33,7 @@ import java.io.InputStream;
 public class TheGame implements ApplicationListener, InputProcessor
 {
     //gamemode:
-    boolean playing = true;
+    GameState gameState;
 
     //Controls
     private int sensitivity = 30;
@@ -63,6 +64,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     private Texture starTexture;
     private Texture shuttleTexture;
     private Texture planetTexture;
+	private Texture backgroundTexture;
 
     //probably temp
     ObjLoader loader;
@@ -73,6 +75,7 @@ public class TheGame implements ApplicationListener, InputProcessor
      * It does some initializing and first time settings
      */
     public void create() {
+	    gameState = GameState.START;
         //second camera used to print text on the screen
         this.secondCamera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         this.spriteBatch = new SpriteBatch();
@@ -101,6 +104,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         starTexture = new Texture("graphics/white.jpg");
         shuttleTexture = new Texture("graphics/cruiser/Textures/cruiser.png");
         planetTexture = new Texture("graphics/Moon/moon.png");
+	    backgroundTexture = new Texture ("graphics/space_background.jpg");
 
 	    loadModels();
 
@@ -430,9 +434,58 @@ public class TheGame implements ApplicationListener, InputProcessor
      * The "loop", this is called indefinitely as the program runs.
      */
     public void render() {
-        update();
-        display();
+
+	    switch(gameState)
+	    {
+		    case PLAYING:
+			    update();
+			    display();
+			    break;
+
+		    case MENU:
+			    updateMenu();
+			    //displayMenu();
+			    break;
+
+		    case START:
+			    update();
+			    displayStartMenu(); //..... for now
+			    break;
+	    }
+
      }
+
+	public void updateMenu()
+	{
+        Gdx.gl11.glClearColor(0,0,0, 1);
+	    Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+		this.spriteBatch.begin();
+		font.setColor(Color.GREEN);
+		spriteBatch.draw(backgroundTexture, 0, 0);
+		font.draw(this.spriteBatch, String.format("Change to inverse control"), 50, 450);
+		this.spriteBatch.end();
+	}
+
+	public void displayStartMenu()
+	{
+		Gdx.gl11.glClearColor(0,0,0,1);
+		Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+		this.spriteBatch.begin();
+		spriteBatch.draw(backgroundTexture, 0, 0);
+		font.setColor(1, 1, 1, 1f);
+		font.draw(this.spriteBatch, String.format("WELCOME TO SPACE-DOROL!"), Gdx.graphics.getWidth() / 2 - 100,
+				600);
+		font.draw(this.spriteBatch, String.format("Press S to start"), 130, 400);
+		font.draw(this.spriteBatch, String.format("Use W-A-S-D along with the mouse to navigate in space"), 130, 350);
+		font.draw(this.spriteBatch, String.format("Press 'M' for in-game options!"), 130, 300);
+		this.spriteBatch.end();
+
+		if(Gdx.input.isKeyPressed(Input.Keys.S))
+			this.gameState = GameState.PLAYING;
+
+	}
 
     @Override
     public void resize(int arg0, int arg1) {
@@ -480,7 +533,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
     @Override
     public boolean touchDown(int arg0, int arg1, int arg2, int arg3) {
-        if (playing){
+        if (gameState == GameState.PLAYING){
             this.shoot();
         }
         return false;
