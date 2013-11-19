@@ -32,6 +32,9 @@ import java.io.InputStream;
  */
 public class TheGame implements ApplicationListener, InputProcessor
 {
+    //networking:
+    private NetworkThread network;
+
     //gamemode:
     GameState gameState;
 
@@ -78,6 +81,10 @@ public class TheGame implements ApplicationListener, InputProcessor
      * It does some initializing and first time settings
      */
     public void create() {
+        // Kickstart the network thread
+        network = new NetworkThread();
+        network.start();
+
 	    gameState = GameState.START;
         //second camera used to print text on the screen
         this.secondCamera = new OrthographicCamera(Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
@@ -293,11 +300,18 @@ public class TheGame implements ApplicationListener, InputProcessor
         p1.yaw(Gdx.input.getDeltaX()*deltaTime * sensitivity);
         p1.pitch(-Gdx.input.getDeltaY()*deltaTime * sensitivity * inverted);
 
-        updatePlayer();
-
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
             p1.eye.x = p1.eye.y = p1.eye.z = 0;
         }
+
+        updatePlayer();
+
+        //Broadcast the new position
+        String stringMessage = String.format("move;%s;%s;%s", Float.toString(p1.eye.x),Float.toString(p1.eye.y),Float.toString(p1.eye.z));
+        this.network.sendMessage(stringMessage);
+
+
+
 
         if (Gdx.input.isKeyPressed(Input.Keys.M)){
             gameState = GameState.MENU;
@@ -388,7 +402,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         drawEnvironment();
 
-        //drawShuttles();
+        drawPlayers();
 
         p1.draw();
 
@@ -417,25 +431,17 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
     }
 
-    private void drawShuttles(){
-        //unit vectors
-        Vector3D i = new Vector3D(1,0,0);
-        Vector3D j = new Vector3D(0,0,1);
-        Vector3D k = new Vector3D(0,1,0);
-        //reference point
-        Point3D pos = new Point3D(p1.eye.x, p1.eye.y, p1.eye.z);
+    private void drawPlayers(){
 
-
-        Gdx.gl10.glPushMatrix();
-        Gdx.gl10.glTranslatef(50000, 50000,50000);
-        Vector3D v = Vector3D.sum(p1.n,new Vector3D(0,0,0)); //n
-        v.normalize();
-
-        Gdx.gl10.glRotatef(180,0,0,0);
-        Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-        shuttleTexture.bind();
-        shuttle.render();
-        Gdx.gl10.glPopMatrix();
+        for (NetworkPlayer p : NetworkGameState.instance().getPlayers()){
+            Gdx.gl10.glPushMatrix();
+            Gdx.gl10.glTranslatef(p.position.x, p.position.y,p.position.z);
+            //Gdx.gl10.glRotatef(180,0,0,0);
+            Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
+            shuttleTexture.bind();
+            shuttle.render();
+            Gdx.gl10.glPopMatrix();
+        }
 
     }
 
