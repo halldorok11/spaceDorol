@@ -104,7 +104,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         starTexture = new Texture("graphics/white.jpg");
         shuttleTexture = new Texture("graphics/cruiser/Textures/cruiser.png");
         planetTexture = new Texture("graphics/Moon/moon.png");
-	    backgroundTexture = new Texture ("graphics/space_background.jpg");
+	    backgroundTexture = new Texture ("graphics/space_background.png");
 
 	    loadModels();
 
@@ -473,7 +473,8 @@ public class TheGame implements ApplicationListener, InputProcessor
 		Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
 		this.spriteBatch.begin();
-		spriteBatch.draw(backgroundTexture, 0, 0);
+        spriteBatch.draw(backgroundTexture,0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+		///spriteBatch.draw(backgroundTexture, 0, 0);
 		font.setColor(1, 1, 1, 1f);
 		font.draw(this.spriteBatch, String.format("WELCOME TO SPACE-DOROL!"), Gdx.graphics.getWidth() / 2 - 100,
 				600);
