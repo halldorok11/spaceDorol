@@ -102,10 +102,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         shuttleTexture = new Texture("graphics/cruiser/Textures/cruiser.png");
         planetTexture = new Texture("graphics/Moon/moon.png");
 
+	    loadModels();
+
         //camera
         p1 = new Player(new Point3D(0.0f, 3.0f, 2.0f), new Point3D(2.0f, 3.0f, 3.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
-
-        loadModels();
         initialize();
     }
 
@@ -241,29 +241,29 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         //turn to the left
         if(Gdx.input.isKeyPressed(Input.Keys.A))
-            p1.yaw(-120.0f * deltaTime);
+            p1.yaw(-60f * deltaTime);
 
         //turn to the right
         if(Gdx.input.isKeyPressed(Input.Keys.D))
-            p1.yaw(120.0f * deltaTime);
+            p1.yaw(60f * deltaTime);
 
         //slide forward
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
-            p1.slide(0.0f, 0.0f, -10.0f * deltaTime);
+            p1.slide(0.0f, 0.0f, -5.0f * deltaTime);
         }
 
         //slide backward
         if(Gdx.input.isKeyPressed(Input.Keys.S)) {
-            p1.slide(0.0f, 0.0f, 10.0f * deltaTime);
+            p1.slide(0.0f, 0.0f, 5.0f * deltaTime);
         }
 
         //slide up
         if(Gdx.input.isKeyPressed(Input.Keys.R))
-            p1.slide(0.0f, 10.0f * deltaTime, 0.0f);
+            p1.slide(0.0f, 5f * deltaTime, 0.0f);
 
         //slide down
         if(Gdx.input.isKeyPressed(Input.Keys.F))
-           p1.slide(0.0f, -10.0f * deltaTime, 0.0f);
+           p1.slide(0.0f, -5f * deltaTime, 0.0f);
 
         if(Gdx.input.isKeyPressed(Input.Keys.UP))
             p1.pitch(-90.0f * deltaTime);
@@ -414,7 +414,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 
         Gdx.gl10.glPushMatrix();
-        //Gdx.gl10.glTranslatef(p1.eye.x, p1.eye.y - 1, p1.eye.z);
+        //Gdx.gl10.glTranslatef(p1.eye.x + 8, p1.eye.y + 8, p1.eye.z + 8);
         Gdx.gl10.glTranslatef(50000, 50000,50000);
         Vector3D v = Vector3D.sum(p1.n, Vector3D.sum(p1.u, p1.v)); //reverse n
         v.normalize();

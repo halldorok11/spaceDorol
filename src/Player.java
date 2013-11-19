@@ -1,5 +1,6 @@
 
 
+import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL11;
 
 import com.badlogic.gdx.Gdx;
@@ -51,6 +52,18 @@ public class Player
 		
 		Gdx.gl11.glMatrixMode(GL11.GL_MODELVIEW);
 		Gdx.gl11.glLoadMatrixf(matrix, 0);
+
+		Gdx.gl10.glPushMatrix();
+		//Gdx.gl10.glTranslatef(p1.eye.x + 8, p1.eye.y + 8, p1.eye.z + 8);
+		Gdx.gl10.glTranslatef(eye.x + 8, eye.y + 8 ,eye.z + 8);
+		//Vector3D v = Vector3D.sum(p1.n, Vector3D.sum(p1.u, p1.v)); //reverse n
+		//v.normalize();
+
+		//Gdx.gl10.glRotatef(180,0,0,0);
+		Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
+		ship.tex.bind();
+		ship.model.render();
+		Gdx.gl10.glPopMatrix();
 	}
 	
 	public void slide(float delU, float delV, float delN) {

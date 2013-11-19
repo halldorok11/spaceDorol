@@ -1,5 +1,6 @@
 
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 
@@ -19,7 +20,8 @@ public class DesktopStarter
         // Set the screen size to same as the desktop screen size.
         cfg.width = scrnsize.width;
         cfg.height = scrnsize.height;
-        cfg.useGL20 = false;
+
+		cfg.useGL20 = false;
 
         // Set OpenGL to game mode (full screen.)
         cfg.fullscreen = true;
