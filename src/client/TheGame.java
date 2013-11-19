@@ -37,6 +37,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
     //Controls
     private int sensitivity = 30;
+    private int inverted = 1; //used for mouse camera controls
 
     //Space variables
     private int numberOfSectors = 100; //10x10x10
@@ -46,7 +47,6 @@ public class TheGame implements ApplicationListener, InputProcessor
 
     //Player 1
     private Player p1;
-
     private List<Projectile> projectiles;
 
     // text
@@ -58,6 +58,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     private Sector[][][] sectors;
     private StillModel shuttle;
     private StillModel planet;
+    ObjLoader loader;
 
     //Different textures for different 3D objects
     private Texture projectileTexture;
@@ -66,8 +67,10 @@ public class TheGame implements ApplicationListener, InputProcessor
     private Texture planetTexture;
 	private Texture backgroundTexture;
 
-    //probably temp
-    ObjLoader loader;
+    //Variables for the Menu
+    private int line = 0;
+    private int nrOfLines = 1;
+
 
     @Override
     /**
@@ -285,12 +288,16 @@ public class TheGame implements ApplicationListener, InputProcessor
             p1.speed = new Vector3D(0,0,0);
         }
         p1.yaw(Gdx.input.getDeltaX()*deltaTime * sensitivity);
-        p1.pitch(-Gdx.input.getDeltaY()*deltaTime * sensitivity);
+        p1.pitch(-Gdx.input.getDeltaY()*deltaTime * sensitivity * inverted);
 
         updatePlayer();
 
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
             p1.eye.x = p1.eye.y = p1.eye.z = 0;
+        }
+
+        if (Gdx.input.isKeyPressed(Input.Keys.M)){
+            gameState = GameState.MENU;
         }
 
         hit();
@@ -457,13 +464,21 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 	public void updateMenu()
 	{
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
+            inverted *= -1;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.M)){
+            gameState = GameState.PLAYING;
+        }
+
         Gdx.gl11.glClearColor(0,0,0, 1);
 	    Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
 		this.spriteBatch.begin();
 		font.setColor(Color.GREEN);
-		spriteBatch.draw(backgroundTexture, 0, 0);
-		font.draw(this.spriteBatch, String.format("Change to inverse control"), 50, 450);
+		spriteBatch.draw(backgroundTexture, 0, 0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		font.draw(this.spriteBatch, String.format("Press 1 to toggle inverse mouse control"), -100, 0);
+        font.draw(this.spriteBatch, String.format("Press M to continue game"), -100, -20);
 		this.spriteBatch.end();
 	}
 
