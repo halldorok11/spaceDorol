@@ -241,11 +241,11 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         //turn to the left
         if(Gdx.input.isKeyPressed(Input.Keys.A))
-            p1.yaw(-60f * deltaTime);
+            p1.roll(60f * deltaTime);
 
         //turn to the right
         if(Gdx.input.isKeyPressed(Input.Keys.D))
-            p1.yaw(60f * deltaTime);
+            p1.roll(-60f * deltaTime);
 
         //slide forward
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -280,9 +280,8 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             p1.speed = new Vector3D(0,0,0);
         }
-
-        p1.roll(-Gdx.input.getDeltaX()*deltaTime * sensitivity);
-        p1.pitch(Gdx.input.getDeltaY()*deltaTime * sensitivity);
+        p1.yaw(Gdx.input.getDeltaX()*deltaTime * sensitivity);
+        p1.pitch(-Gdx.input.getDeltaY()*deltaTime * sensitivity);
 
         updatePlayer();
 
