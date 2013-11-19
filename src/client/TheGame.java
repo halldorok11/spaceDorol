@@ -228,7 +228,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         projectileTexture.dispose();
         starTexture.dispose();
         shuttle.dispose();
-        //shuttleTexture.dispose();
+        shuttleTexture.dispose();
+        planet.dispose();
+        planetTexture.dispose();
+        backgroundTexture.dispose();
     }
 
     @Override
@@ -248,11 +251,11 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         //turn to the left
         if(Gdx.input.isKeyPressed(Input.Keys.A))
-            p1.roll(60f * deltaTime);
+            p1.roll(90f * deltaTime);
 
         //turn to the right
         if(Gdx.input.isKeyPressed(Input.Keys.D))
-            p1.roll(-60f * deltaTime);
+            p1.roll(-90f * deltaTime);
 
         //slide forward
         if(Gdx.input.isKeyPressed(Input.Keys.W)) {
@@ -450,40 +453,64 @@ public class TheGame implements ApplicationListener, InputProcessor
 			    break;
 
 		    case MENU:
-			    updateMenu();
+			    helpMenu();
 			    //displayMenu();
 			    break;
 
 		    case START:
-			    update();
-			    displayStartMenu(); //..... for now
+			    //update();
+			    startMenu(); //..... for now
 			    break;
 	    }
 
      }
 
-	public void updateMenu()
+	public void helpMenu()
 	{
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+
+
         if (Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
-            inverted *= -1;
+            inverted = -1;
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.M)){
+        if (Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
+            inverted = 1;
+        }
+        if (Gdx.input.isKeyPressed(Input.Keys.Q)){
             gameState = GameState.PLAYING;
         }
 
+        Gdx.gl11.glDisable(GL11.GL_LIGHTING);
         Gdx.gl11.glClearColor(0,0,0, 1);
 	    Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
 		this.spriteBatch.begin();
-		font.setColor(Color.GREEN);
-		spriteBatch.draw(backgroundTexture, 0, 0,Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		font.draw(this.spriteBatch, String.format("Press 1 to toggle inverse mouse control"), -100, 0);
-        font.draw(this.spriteBatch, String.format("Press M to continue game"), -100, -20);
+		font.setColor(Color.WHITE);
+		spriteBatch.draw(backgroundTexture, -width/2, -height/2,width, height); //the middle is at coords 0,0
+        font.draw(this.spriteBatch, String.format("Press Q to continue game"), -100, 100);
+        font.draw(this.spriteBatch, String.format("Keyboard controls:"), -300, 200);
+        font.draw(this.spriteBatch, String.format("Forward: W"), -300, 180);
+        font.draw(this.spriteBatch, String.format("Backward: S"), -300, 160);
+        font.draw(this.spriteBatch, String.format("Roll right: D"), -300, 140);
+        font.draw(this.spriteBatch, String.format("Roll left: A"), -300, 120);
+        font.draw(this.spriteBatch, String.format("Mouse controls: "), -300, 80);
+        font.draw(this.spriteBatch, String.format("Look up: Mouse up"), -300, 60);
+        font.draw(this.spriteBatch, String.format("Look down: Mouse down"), -300, 40);
+        font.draw(this.spriteBatch, String.format("Look right: Mouse right"), -300, 20);
+        font.draw(this.spriteBatch, String.format("Look left: Mouse left"), -300, 0);
+
+        if (inverted == 1) font.setColor(Color.RED);
+        else if (inverted == -1) font.setColor(Color.GREEN);
+		font.draw(this.spriteBatch, String.format("Press 1/2 to toggle on/off inverse vertical mouse control"), -100, 0);
+
 		this.spriteBatch.end();
+        Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 	}
 
-	public void displayStartMenu()
+	public void startMenu()
 	{
+        Gdx.gl11.glDisable(GL11.GL_LIGHTING);
 		Gdx.gl11.glClearColor(0,0,0,1);
 		Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
@@ -500,6 +527,8 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 		if(Gdx.input.isKeyPressed(Input.Keys.S))
 			this.gameState = GameState.PLAYING;
+
+        Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 
 	}
 
