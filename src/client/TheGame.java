@@ -438,7 +438,7 @@ public class TheGame implements ApplicationListener, InputProcessor
             Gdx.gl10.glTranslatef(p.position.x, p.position.y,p.position.z);
             //Gdx.gl10.glRotatef(180,0,0,0);
             Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-            shuttleTexture.bind();
+            //shuttleTexture.bind();
             shuttle.render();
             Gdx.gl10.glPopMatrix();
         }
