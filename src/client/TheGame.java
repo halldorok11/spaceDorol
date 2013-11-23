@@ -65,15 +65,15 @@ public class TheGame implements ApplicationListener, InputProcessor
     //3D objects
     private Sector[][][] sectors;
     private StillModel shuttle;
-    private StillModel planet;
-    private StillModel projectileModel;
+    private StillModel neutralplanet;
+    private StillModel blueplanet;
+    private StillModel redplanet;
+    private StillModel blueProjectileModel;
+    private StillModel redProjectileModel;
     ObjLoader loader;
 
     //Different textures for different 3D objects
-    private Texture projectileTexture;
-    private Texture starTexture;
     private Texture shuttleTexture;
-    private Texture planetTexture;
 	private Texture backgroundTexture;
 
     //Variables for the Menu
@@ -116,10 +116,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
         //assign images to the textures
-        projectileTexture = new Texture("graphics/water.jpg");
-        starTexture = new Texture("graphics/white.jpg");
         shuttleTexture = new Texture("graphics/cruiser/Textures/cruiser.png");
-        planetTexture = new Texture("graphics/Moon/moon.png");
 	    backgroundTexture = new Texture ("graphics/space_background.png");
 
 	    loadModels();
@@ -138,14 +135,29 @@ public class TheGame implements ApplicationListener, InputProcessor
             shuttle = loader.loadObj(in, true);
         }
 
-        if (planet == null) {
-            in = new FileHandle(Gdx.files.internal("graphics/Moon/moon.obj").path());
-            planet = loader.loadObj(in,true);
+        if (neutralplanet == null) {
+            in = new FileHandle(Gdx.files.internal("graphics/Sphere/neutralmoon.obj").path());
+            neutralplanet = loader.loadObj(in,true);
         }
 
-        if (projectileModel == null){
-            in = new FileHandle(Gdx.files.internal("graphics/Moon/moon.obj").path());
-            projectileModel = loader.loadObj(in, true);
+        if (redplanet == null) {
+            in = new FileHandle(Gdx.files.internal("graphics/Sphere/redmoon.obj").path());
+            redplanet = loader.loadObj(in,true);
+        }
+
+        if (blueplanet == null) {
+            in = new FileHandle(Gdx.files.internal("graphics/Sphere/bluemoon.obj").path());
+            blueplanet = loader.loadObj(in,true);
+        }
+
+        if (redProjectileModel == null){
+            in = new FileHandle(Gdx.files.internal("graphics/Sphere/redprojectile.obj").path());
+            redProjectileModel = loader.loadObj(in, true);
+        }
+
+        if (blueProjectileModel == null){
+            in = new FileHandle(Gdx.files.internal("graphics/Sphere/blueplrojectile.obj").path());
+            blueProjectileModel = loader.loadObj(in, true);
         }
     }
 
@@ -154,7 +166,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         int i = numberOfSectors/2;
 
-        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector,planetTexture, planet);
+        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector);
         generateSector(sectors[i][i][i]);
 
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
@@ -193,7 +205,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (x > 0 && y > 0 && z > 0){
             if (x < numberOfSectors-1 && y < numberOfSectors-1 && z < numberOfSectors-1){
                 if (sectors[x][y][z] == null){
-                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector, planetTexture, planet);
+                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector);
                 }
             }
         }
@@ -248,12 +260,8 @@ public class TheGame implements ApplicationListener, InputProcessor
      * called when the application is closed
      */
     public void dispose() {
-        projectileTexture.dispose();
-        starTexture.dispose();
         shuttle.dispose();
         shuttleTexture.dispose();
-        planet.dispose();
-        planetTexture.dispose();
         backgroundTexture.dispose();
     }
 
@@ -374,7 +382,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (x > 0 && y > 0 && z > 0){
             if (x < numberOfSectors-1 && y < numberOfSectors-1 && z < numberOfSectors-1){
                 if (sectors[x][y][z] != null){
-                    sectors[x][y][z].draw();
+                    sectors[x][y][z].draw(neutralplanet,blueplanet,redplanet);
                 }
             }
         }
