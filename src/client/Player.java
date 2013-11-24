@@ -20,14 +20,16 @@ public class Player
     float x_rotation = 0;
     float y_rotation = 0;
     float z_rotation = 0;
+    Sector currentSector;
 
     //Speed related:
     Vector3D speed;
     int maxspeed = 2;
 
-    Sector currentSector;
-
+    //model
     Spaceship ship;
+
+    public int team = 0;
 
 	public Player(Point3D pEye, Point3D pLookat, Vector3D up, Spaceship ship) {
 		eye = pEye;

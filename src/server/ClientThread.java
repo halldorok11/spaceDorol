@@ -115,6 +115,11 @@ public class ClientThread extends Thread {
                                     String p = String.format("shot;%s;%s;%s;%s;%s;%s;%s", this.nick,tokens[1],tokens[2],tokens[3],tokens[4],tokens[5],tokens[6]);
                                     ClientThreads.instance().broadcast(this, p);
                                 }
+
+                                if (action.equals("team")){
+                                    String p = String.format("team;%s;%s",this.nick,tokens[1]);
+                                    ClientThreads.instance().broadcast(this,p);
+                                }
                         } 
                         catch (IOException e) {
                                 // TODO Auto-generated catch block

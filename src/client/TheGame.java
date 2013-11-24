@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import java.io.InputStream;
@@ -75,10 +76,6 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Different textures for different 3D objects
     private Texture shuttleTexture;
 	private Texture backgroundTexture;
-
-    //Variables for the Menu
-    private int line = 0;
-    private int nrOfLines = 1;
 
 
     @Override
@@ -156,7 +153,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
 
         if (blueProjectileModel == null){
-            in = new FileHandle(Gdx.files.internal("graphics/Sphere/blueplrojectile.obj").path());
+            in = new FileHandle(Gdx.files.internal("graphics/Sphere/blueprojectile.obj").path());
             blueProjectileModel = loader.loadObj(in, true);
         }
     }
@@ -247,10 +244,10 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         Vector3D speed = Vector3D.sum(p1.speed, forward);
 
-        projectiles.add(new Projectile(location,speed));
+        projectiles.add(new Projectile(location,speed, p1.team));
 
         //Broadcast the new projectile
-        String stringMessage = String.format("shot;%s;%s;%s,%s,%s,%s", Float.toString(location.x),Float.toString(location.y),Float.toString(location.z),
+        String stringMessage = String.format("shot;%s;%s;%s,%s,%s,%s,%s", Integer.toString(p1.team), Float.toString(location.x),Float.toString(location.y),Float.toString(location.z),
                                                                        Float.toString(speed.x), Float.toString(speed.y), Float.toString(speed.z));
         this.network.sendMessage(stringMessage);
     }
@@ -298,25 +295,17 @@ public class TheGame implements ApplicationListener, InputProcessor
             p1.slide(0.0f, 0.0f, 5.0f * deltaTime);
         }
 
-        //slide up
-        if(Gdx.input.isKeyPressed(Input.Keys.R))
-            p1.slide(0.0f, 5f * deltaTime, 0.0f);
-
-        //slide down
-        if(Gdx.input.isKeyPressed(Input.Keys.F))
-           p1.slide(0.0f, -5f * deltaTime, 0.0f);
-
         if(Gdx.input.isKeyPressed(Input.Keys.UP))
-            p1.pitch(-90.0f * deltaTime);
+            p1.pitch(-90.0f * deltaTime * inverted);
 
         if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
-            p1.pitch(90.0f * deltaTime);
+            p1.pitch(90.0f * deltaTime * inverted);
 
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            p1.roll(-90.0f * deltaTime);
+            p1.yaw(-90.0f * deltaTime);
 
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            p1.roll(90.0f * deltaTime);
+            p1.yaw(90.0f * deltaTime);
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             p1.speed = new Vector3D(0,0,0);
@@ -389,13 +378,18 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void updateProjectiles(){
-        NetworkGameState.instance().updateProjectiles();
+        List<Integer> removables = new ArrayList<Integer>();
 
         for (Projectile p : projectiles){
             if (!p.update()){
-                projectiles.remove(p);
+                removables.add(projectiles.indexOf(p));
             }
         }
+        for (int r : removables){
+            projectiles.remove(r);
+        }
+
+        NetworkGameState.instance().updateProjectiles();
     }
 
     private void drawProjectiles(){
@@ -403,7 +397,10 @@ public class TheGame implements ApplicationListener, InputProcessor
             Gdx.gl10.glPushMatrix();
             Gdx.gl10.glTranslatef(p.position.x, p.position.y,p.position.z);
             Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-            projectileModel.render();
+            if(p.team == 1) //blue
+                blueProjectileModel.render();
+            if(p.team == 2) //red
+                redProjectileModel.render();
             Gdx.gl10.glPopMatrix();
         }
 
@@ -411,7 +408,10 @@ public class TheGame implements ApplicationListener, InputProcessor
             Gdx.gl10.glPushMatrix();
             Gdx.gl10.glTranslatef(p.position.x, p.position.y,p.position.z);
             Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-            projectileModel.render();
+            if(p.team == 1) //blue
+                blueProjectileModel.render();
+            if(p.team == 2) //red
+                redProjectileModel.render();
             Gdx.gl10.glPopMatrix();
         }
     }
@@ -564,17 +564,30 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 		this.spriteBatch.begin();
         spriteBatch.draw(backgroundTexture,0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-		///spriteBatch.draw(backgroundTexture, 0, 0);
 		font.setColor(1, 1, 1, 1f);
-		font.draw(this.spriteBatch, String.format("WELCOME TO SPACE-DOROL!"), Gdx.graphics.getWidth() / 2 - 100,
-				600);
-		font.draw(this.spriteBatch, String.format("Press S to start"), 130, 400);
+		font.draw(this.spriteBatch, String.format("WELCOME TO SPACE-DOROL!"), Gdx.graphics.getWidth() / 2 - 100, 600);
+        font.setColor(0.7f, 0.7f, 1, 1f);
+        font.draw(this.spriteBatch, String.format("Press B to join the game as a member of the blue team"), 130, 550);
+        font.setColor(1, 0.7f, 0.7f, 1f);
+		font.draw(this.spriteBatch, String.format("Press R to join the game as a member of the red team"), 130, 500);
+        font.setColor(1, 1, 1, 1f);
 		font.draw(this.spriteBatch, String.format("Use W-A-S-D along with the mouse to navigate in space"), 130, 350);
 		font.draw(this.spriteBatch, String.format("Press 'M' for in-game options!"), 130, 300);
 		this.spriteBatch.end();
 
-		if(Gdx.input.isKeyPressed(Input.Keys.S))
-			this.gameState = GameState.PLAYING;
+        if(Gdx.input.isKeyPressed(Input.Keys.B)){
+            this.gameState = GameState.PLAYING;
+            p1.team = 1; //blue
+            String s = String.format("team;%s",Integer.toString(p1.team));
+            network.sendMessage(s);
+        }
+
+		if(Gdx.input.isKeyPressed(Input.Keys.R)){
+            this.gameState = GameState.PLAYING;
+            p1.team = 2; //red
+            String s = String.format("team;%s",Integer.toString(p1.team));
+            network.sendMessage(s);
+        }
 
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 

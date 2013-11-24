@@ -56,10 +56,12 @@ public class NetworkThread extends Thread {
                 String name = tokens[1];
 
                 if(tokens[0].equals("online")) {
+                    int team = Integer.parseInt(tokens[2]);
                     NetworkGameState.instance().addPlayer(name);
                 }
 
                 if(tokens[0].equals("join")) {
+                    int team = Integer.parseInt(tokens[2]);
                     NetworkGameState.instance().addPlayer(name);
                 }
 
@@ -75,13 +77,15 @@ public class NetworkThread extends Thread {
                 }
 
                 if(tokens[0].equals("shot")){
-                    Point3D p = new Point3D(Float.parseFloat(tokens[2]), Float.parseFloat(tokens[3]), Float.parseFloat(tokens[4]));
-                    Vector3D speed = new Vector3D(Float.parseFloat(tokens[5]), Float.parseFloat(tokens[6]), Float.parseFloat(tokens[7]));
-                    NetworkGameState.instance().addProjectile(p,speed);
+                    int team = Integer.parseInt(tokens[2]);
+                    Point3D p = new Point3D(Float.parseFloat(tokens[3]), Float.parseFloat(tokens[4]), Float.parseFloat(tokens[5]));
+                    Vector3D speed = new Vector3D(Float.parseFloat(tokens[6]), Float.parseFloat(tokens[7]), Float.parseFloat(tokens[8]));
+                    NetworkGameState.instance().addProjectile(p,speed,team);
                 }
 
-                if(tokens[0].equals("decay")){
-                    NetworkGameState.instance().removeProjectile(name);
+                if (tokens[0].equals("team")){
+                    int team = Integer.parseInt(tokens[2]);
+                    NetworkGameState.instance().setTeam(name,team);
                 }
 
             } catch (IOException e) {

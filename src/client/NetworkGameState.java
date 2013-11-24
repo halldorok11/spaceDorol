@@ -25,16 +25,12 @@ public class NetworkGameState {
         this.players.remove(name);
     }
 
-    public synchronized void removeProjectile(String id){
-        this.projectiles.remove(id);
-    }
-
     public synchronized void addPlayer(String name) {
         this.players.put(name, new NetworkPlayer());
     }
 
-    public synchronized void addProjectile(Point3D pos, Vector3D speed) {
-        this.projectiles.add(new NetworkProjectile(pos,speed));
+    public synchronized void addProjectile(Point3D pos, Vector3D speed, int team) {
+        this.projectiles.add(new NetworkProjectile(pos,speed,team));
     }
 
     public void updatePlayer(String name, float x, float y, float z) {
@@ -42,13 +38,23 @@ public class NetworkGameState {
             this.players.get(name).update(x, y, z);
     }
 
+    public void setTeam(String name, int team){
+        if (this.players.containsKey(name))
+            this.players.get(name).team = team;
+    }
+
     public void updateProjectiles(){
+        List<Integer> removables = new ArrayList<Integer>();
+
         for (NetworkProjectile p : this.projectiles){
             if (!p.update()){
                 //If the projectile has traveled to far.
-                projectiles.remove(p);
+                removables.add(projectiles.indexOf(p));
             }
-            //otherwise we will continue aftuer updateing the missile position.
+            //otherwise we will continue after updating the missile position.
+        }
+        for (int r : removables){
+            projectiles.remove(r);
         }
     }
 
