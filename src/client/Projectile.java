@@ -1,5 +1,3 @@
-import com.badlogic.gdx.graphics.Texture;
-
 /**
  * Created by: Halldór Örn Kristjánsson
  * Date: 11/6/13
