@@ -390,7 +390,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         updatePlayer();
         updateProjectiles();
-        //updateScore();
+        updateScore();
         hit();
 
         if (p1.speed.length() > 0){
@@ -451,7 +451,7 @@ public class TheGame implements ApplicationListener, InputProcessor
             float len = diff.length();
             if (len < 15){
                 diff.normalize();
-                p1.eye.add(Vector3D.mult(12-len,diff));
+                p1.eye.add(Vector3D.mult(15-len,diff));
             }
         }
     }
@@ -461,7 +461,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void collisionProjectileStar(){
-        //for (Projectile p : )
+
     }
 
     private void drawEnvironment() {
