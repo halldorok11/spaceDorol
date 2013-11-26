@@ -18,6 +18,7 @@ public class Star{
         Gdx.gl10.glTranslatef(pos.x, pos.y, pos.z);
         Gdx.gl10.glScalef(size,size,size);
         Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
+
         switch (team){
             case 0:
                 //neutral

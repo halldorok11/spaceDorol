@@ -469,24 +469,51 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void collisionProjectileStar(){
-	    List<Sector> projectileSectors = new ArrayList<Sector>();
+
+	    List<Projectile> removeList =  new ArrayList<Projectile>();
+	    List<NetworkProjectile> removeNetworkList = new ArrayList<NetworkProjectile>();
+
 	    for(Projectile p : projectiles)
 	    {
 		    Sector s = getSectorForAbsoluteCoordinates(p.position.x,p.position.y,p.position.z);
 		    for(Star star : s.stars)
 		    {
-			    Vector3D diff = Vector3D.difference(p1.eye, star.pos);
+			    Vector3D diff = Vector3D.difference(p.position, star.pos);
 			    float len = diff.length();
 			    if (len < 15){
 				    diff.normalize();
 				    star.team = p.team;
-				    System.out.println("HIT");
+				    removeList.add(p);
 			    }
 		    }
 	    }
+	    for(Projectile p : removeList)
+	    {
+		    projectiles.remove(p);
+	    }
 
+	   //Network projectiles
 
+	    for(NetworkProjectile p : NetworkGameState.instance().getProjectiles())
+	    {
+		    Sector s = getSectorForAbsoluteCoordinates(p.position.x,p.position.y,p.position.z);
+		    for(Star star : s.stars)
+		    {
+			    Vector3D diff = Vector3D.difference(p.position, star.pos);
+			    float len = diff.length();
+			    if (len < 15){
+				    diff.normalize();
+				    star.team = p.team;
+				    removeNetworkList.add(p);
+			    }
+		    }
+	    }
+	    for(NetworkProjectile p : removeNetworkList)
+	    {
+		    NetworkGameState.instance().getProjectiles().remove(p);
+	    }
     }
+
 
     private void drawEnvironment() {
         drawSectors();
@@ -509,13 +536,21 @@ public class TheGame implements ApplicationListener, InputProcessor
                 }
             }
         }
+	   /* for(int i = 0; i < numberOfSectors; i++)
+	    {
+		    for(int j = 0; j < numberOfSectors; j++)
+		    {
+			    for(int k = 0; k < numberOfSectors; k++)
+				    drawSector(i,j,k);
+		    }
+	    } */
     }
 
     private void drawSector(int x, int y, int z){
         if (x >= 0 && y >= 0 && z >= 0){
             if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
                 if (sectors[x][y][z] != null){
-                    sectors[x][y][z].draw(neutralplanet,blueplanet,redplanet);
+                    sectors[x][y][z].draw(neutralplanet,blueProjectileModel,redProjectileModel);
                 }
             }
         }
