@@ -165,13 +165,10 @@ public class TheGame implements ApplicationListener, InputProcessor
     private void initialize(){
         sectors = new Sector[numberOfSectors][numberOfSectors][numberOfSectors]; //n * n * n
 
-        int i = numberOfSectors/2;
-
-        sectors[i][i][i] = new Sector(i*sectorSize,i*sectorSize,i*sectorSize,sectorSize,starsInSector);
-        generateSector(sectors[i][i][i]);
+        generateSectors();
 
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
-        p1.currentSector = sectors[i][i][i];
+        p1.currentSector = sectors[1][1][1];
         projectiles = new ArrayList<Projectile>();
 
         /*
@@ -257,6 +254,16 @@ public class TheGame implements ApplicationListener, InputProcessor
         for (int i = x-1; i <= x+1; i++){
             for (int j = y-1; j <= y+1; j++){
                 for (int k = z-1; k <= z+1; k++){
+                    makeNewSector(i,j,k);
+                }
+            }
+        }
+    }
+
+    private void generateSectors(){
+        for (int i = 0; i <= numberOfSectors; i++){
+            for (int j = 0; j <= numberOfSectors; j++){
+                for (int k = 0; k <= numberOfSectors; k++){
                     makeNewSector(i,j,k);
                 }
             }
@@ -489,8 +496,8 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void drawSector(int x, int y, int z){
-        if (x > 0 && y > 0 && z > 0){
-            if (x < numberOfSectors-1 && y < numberOfSectors-1 && z < numberOfSectors-1){
+        if (x >= 0 && y >= 0 && z >= 0){
+            if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
                 if (sectors[x][y][z] != null){
                     sectors[x][y][z].draw(neutralplanet,blueplanet,redplanet);
                 }
