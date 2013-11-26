@@ -24,8 +24,7 @@ public class Projectile{
 
     public boolean update(){
         position.add(speed);
-        if (Vector3D.difference(position,originalPosition).length() > 2000){ //if it has travelled to far,
-            System.out.println("projectile moved to far");
+        if (Vector3D.difference(position,originalPosition).length() > 1000){ //if it has travelled to far,
             return false;
         }
         return true;

@@ -51,8 +51,8 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Space variables
     private int numberOfSectors = 100; //10x10x10
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
-    private int starsInSector = 30;
-    private int sectorSize = 1000;
+    private int starsInSector = 100; //30
+    private int sectorSize = 3000;  //1000
 
     //Player 1
     private Player p1;
@@ -296,16 +296,16 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.UP))
-            p1.pitch(-90.0f * deltaTime * inverted);
-
-        if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
             p1.pitch(90.0f * deltaTime * inverted);
 
+        if(Gdx.input.isKeyPressed(Input.Keys.DOWN))
+            p1.pitch(-90.0f * deltaTime * inverted);
+
         if(Gdx.input.isKeyPressed(Input.Keys.RIGHT))
-            p1.yaw(-90.0f * deltaTime);
+            p1.yaw(90.0f * deltaTime);
 
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT))
-            p1.yaw(90.0f * deltaTime);
+            p1.yaw(-90.0f * deltaTime);
 
         if (Gdx.input.isKeyPressed(Input.Keys.SPACE)){
             p1.speed = new Vector3D(0,0,0);
