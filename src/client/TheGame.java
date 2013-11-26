@@ -461,7 +461,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void collisionProjectileStar(){
-        for (Projectile p : )
+        //for (Projectile p : )
     }
 
     private void drawEnvironment() {
