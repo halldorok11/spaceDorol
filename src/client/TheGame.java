@@ -51,7 +51,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Space variables
     private int numberOfSectors = 3; //n x n x n
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
-    private int starsInSector = 30; //30
+    private int starsInSector = 40; //30
     private int sectorSize = 1000;  //1000
 
     //Player 1
@@ -400,7 +400,7 @@ public class TheGame implements ApplicationListener, InputProcessor
             p1.eye.x = p1.eye.y = p1.eye.z = 0;
         }
 
-
+        updateSector();
         updatePlayer();
         updateProjectiles();
         updateScore();
@@ -418,6 +418,16 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
 
         hit();
+    }
+
+    private void updateSector(){
+        for (int i = 0; i < numberOfSectors; i++){
+            for (int j = 0; j < numberOfSectors ; j++){
+                for (int k = 0; k < numberOfSectors ; k++){
+                    sectors[i][j][k].claimCheck();
+                }
+            }
+        }
     }
 
     private void updatePlayer(){

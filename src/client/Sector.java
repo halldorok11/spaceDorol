@@ -41,6 +41,51 @@ public class Sector {
         }
     }
 
+    public boolean claimCheck(){
+        int initialclaim = 10;
+        int half = stars.size()/2;
+        int red_count = 0;
+        int blue_count = 0;
+        for (Star s : stars){
+            if (s.team == 1) blue_count++;
+            if (s.team == 2) red_count++;
+        }
+
+        if (claimedBy == 0){ //unclaimed
+            if (blue_count > initialclaim){
+                claimedBy = 1;
+                claimallstars(1);
+                return true;
+            }
+            if (red_count > initialclaim){
+                claimedBy = 2;
+                claimallstars(2);
+                return true;
+            }
+        }
+        if (claimedBy == 1){ //claimed by blue
+            if (red_count > half){
+                claimedBy = 2;
+                claimallstars(2);
+                return true;
+            }
+        }
+        if (claimedBy == 2){  //claimed by red
+            if (blue_count > half){
+                claimedBy = 1;
+                claimallstars(1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void claimallstars(int team){
+        for (Star s : stars){
+            s.team = team;
+        }
+    }
+
     public void draw(StillModel neutralmodel,StillModel bluemodel, StillModel redmodel){
         for (Star s : stars){
             s.draw(neutralmodel,bluemodel,redmodel);
