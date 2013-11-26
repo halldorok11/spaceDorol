@@ -462,6 +462,22 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void collisionProjectileStar(){
+	    List<Sector> projectileSectors = new ArrayList<Sector>();
+	    for(Projectile p : projectiles)
+	    {
+		    Sector s = getSectorForAbsoluteCoordinates(p.position.x,p.position.y,p.position.z);
+		    for(Star star : s.stars)
+		    {
+			    Vector3D diff = Vector3D.difference(p1.eye, star.pos);
+			    float len = diff.length();
+			    if (len < 15){
+				    diff.normalize();
+				    star.team = p.team;
+				    System.out.println("HIT");
+			    }
+		    }
+	    }
+
 
     }
 
@@ -712,6 +728,21 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 
+	}
+
+	private Sector getSectorForAbsoluteCoordinates(float x, float y, float z)
+	{
+
+		int sectorX = (int)x/sectorSize;
+		int sectorY = (int)y/sectorSize;
+		int sectorZ = (int)z/sectorSize;
+
+		if(sectorX >= 0 && sectorY >= 0 && sectorZ >= 0)
+		{
+			if(sectorX < numberOfSectors && sectorY < numberOfSectors && sectorZ < numberOfSectors)
+				return sectors[sectorX][sectorY][sectorZ];
+		}
+		return null;
 	}
 
     @Override
