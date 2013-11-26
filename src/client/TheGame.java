@@ -49,10 +49,10 @@ public class TheGame implements ApplicationListener, InputProcessor
     private int inverted = 1; //used for mouse camera controls
 
     //Space variables
-    private int numberOfSectors = 100; //10x10x10
+    private int numberOfSectors = 5; //5x5x5
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
     private int starsInSector = 100; //30
-    private int sectorSize = 3000;  //1000
+    private int sectorSize = 1000;  //1000
 
     //Player 1
     private Player p1;
@@ -169,6 +169,72 @@ public class TheGame implements ApplicationListener, InputProcessor
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
         p1.currentSector = sectors[i][i][i];
         projectiles = new ArrayList<Projectile>();
+
+	    // Add mirrored sectors on the edges
+	    for(int x = 0; x < numberOfSectors; x++)
+	    {
+	        for(int y = 0; y < numberOfSectors; y++)
+	        {
+		        for(int z = 1; z < numberOfSectors-1; z++)
+		        {
+			        if((x>=1 && x<=3) && (y>=1 && y<=3))
+				        continue;
+
+					if(x == 0 && y == 0) //corner 1
+						sectors[x][y][z] = new Sector(sectors[3][3][z],x*sectorSize,y*sectorSize,z*sectorSize);
+			        else if(x == 4 && y == 0) //corner 2
+			            sectors[x][y][z] = new Sector(sectors[1][3][z],x*sectorSize,y*sectorSize,z*sectorSize);
+			        else if(x == 0 && y == 4) //corner 3
+			            sectors[x][y][z] = new Sector(sectors[3][1][z],x*sectorSize,y*sectorSize,z*sectorSize);
+			        else if(x == 4 && y == 4) //corner 4
+			            sectors[x][y][z] = new Sector(sectors[1][1][z],x*sectorSize,y*sectorSize,z*sectorSize);
+
+			        else  //normal edges
+					{
+						if(x == 0)
+							sectors[x][y][z] = new Sector(sectors[3][y][z],x*sectorSize,y*sectorSize,z*sectorSize);
+						else if(x == 4)
+							sectors[x][y][z] = new Sector(sectors[1][y][z],x*sectorSize,y*sectorSize,z*sectorSize);
+						else if(y == 0)
+							sectors[x][y][z] = new Sector(sectors[x][3][z],x*sectorSize,y*sectorSize,z*sectorSize);
+						else if(y == 4)
+							sectors[x][y][z] = new Sector(sectors[x][1][z],x*sectorSize,y*sectorSize,z*sectorSize);
+					}
+		        }
+	        }
+	    }
+	    // now add the plates on top and on bottom
+	    for(int x = 0; x < numberOfSectors; x++)
+	    {
+		    for(int y = 0; y < numberOfSectors; y++)
+		    {
+			    for(int z = 0; z < numberOfSectors; z += 4)
+			    {
+				    if((x>=1 && x<=3) && (y>=1 && y<=3)) //non edge cases
+				        sectors[x][y][z] = new Sector(sectors[x][y][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+
+				    else
+				    {
+					    if(x == 0 && y == 0)  //corner1
+						    sectors[x][y][z] = new Sector(sectors[3][3][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+					    else if(x == 4 && y == 0) //corner 2
+					        sectors[x][y][z] = new Sector(sectors[1][3][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+					    else if(x == 0 && y == 4) //corner 3
+					        sectors[x][y][z] = new Sector(sectors[3][1][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+					    else if(x == 4 && y == 4) //corner 4
+						    sectors[x][y][z] = new Sector(sectors[1][1][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+
+					    else  //normal edges
+					    {
+					        if(x == 0 || x == 4)
+						        sectors[x][y][z] = new Sector(sectors[Math.abs(3-x)][y][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+						    else if(y == 0 || y == 4)
+						        sectors[x][y][z] = new Sector(sectors[x][Math.abs(3-y)][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
+					    }
+				    }
+			    }
+		    }
+	    }
 
     }
 
@@ -337,7 +403,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         p1.update();
         if (currentSector() != p1.currentSector){
             p1.currentSector = currentSector();
-            generateSector(p1.currentSector);
+            //generateSector(p1.currentSector);
         }
     }
 
