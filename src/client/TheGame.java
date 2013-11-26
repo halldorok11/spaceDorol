@@ -550,7 +550,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (x >= 0 && y >= 0 && z >= 0){
             if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
                 if (sectors[x][y][z] != null){
-                    sectors[x][y][z].draw(neutralplanet,blueProjectileModel,redProjectileModel);
+                    sectors[x][y][z].draw(neutralplanet,blueplanet,redplanet);
                 }
             }
         }
