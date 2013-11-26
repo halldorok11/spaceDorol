@@ -49,7 +49,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     private int inverted = 1; //used for mouse camera controls
 
     //Space variables
-    private int numberOfSectors = 5; //5x5x5
+    private int numberOfSectors = 3; //n x n x n
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
     private int starsInSector = 30; //30
     private int sectorSize = 1000;  //1000
@@ -174,6 +174,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         p1.currentSector = sectors[i][i][i];
         projectiles = new ArrayList<Projectile>();
 
+        /*
 	    // Add mirrored sectors on the edges
 	    for(int x = 0; x < numberOfSectors; x++)
 	    {
@@ -238,7 +239,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 				    }
 			    }
 		    }
-	    }
+	    }*/
 
     }
 
@@ -269,8 +270,8 @@ public class TheGame implements ApplicationListener, InputProcessor
      * @param z third index into sectors
      */
     private void makeNewSector(int x, int y, int z){
-        if (x > 0 && y > 0 && z > 0){
-            if (x < numberOfSectors-1 && y < numberOfSectors-1 && z < numberOfSectors-1){
+        if (x >= 0 && y >= 0 && z >= 0){
+            if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
                 if (sectors[x][y][z] == null){
                     sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector);
                 }
@@ -417,9 +418,9 @@ public class TheGame implements ApplicationListener, InputProcessor
     private void updateScore(){
         blueScore = 0;
         redScore = 0;
-        for (int i = 1; i < 4; i++){
-            for (int j = 1; j < 4 ; j++){
-                for (int k = 1; k < 4 ; k++){
+        for (int i = 0; i < numberOfSectors; i++){
+            for (int j = 0; j < numberOfSectors ; j++){
+                for (int k = 0; k < numberOfSectors ; k++){
                     if (sectors[i][j][k].claimedBy == 1){
                         blueScore += 1;
                     }
