@@ -321,9 +321,11 @@ public class TheGame implements ApplicationListener, InputProcessor
             p1.eye.x = p1.eye.y = p1.eye.z = 0;
         }
 
+
         updatePlayer();
         updateProjectiles();
-        updateScore();
+        //updateScore();
+        hit();
 
         if (p1.speed.length() > 0){
             //Broadcast the new position
@@ -335,7 +337,6 @@ public class TheGame implements ApplicationListener, InputProcessor
             gameState = GameState.MENU;
         }
 
-        hit();
     }
 
     private void updatePlayer(){
@@ -367,7 +368,33 @@ public class TheGame implements ApplicationListener, InputProcessor
      * This function checks for any collision and updates the world accordingly
      */
     private void hit(){
+        //player to star collision
+        collisionPlayerStar();
 
+        //player to projectile collision
+        collisionPlayerProjectile();
+
+        //projectile to star collision
+        collisionProjectileStar();
+    }
+
+    private void collisionPlayerStar(){
+        for (Star s : currentSector().stars){
+            Vector3D diff = Vector3D.difference(p1.eye, s.pos);
+            float len = diff.length();
+            if (len < 15){
+                diff.normalize();
+                p1.eye.add(Vector3D.mult(12-len,diff));
+            }
+        }
+    }
+
+    private void collisionPlayerProjectile(){
+
+    }
+
+    private void collisionProjectileStar(){
+        for (Projectile p : )
     }
 
     private void drawEnvironment() {

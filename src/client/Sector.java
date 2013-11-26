@@ -34,12 +34,7 @@ public class Sector {
 
     public void draw(StillModel neutralmodel,StillModel bluemodel, StillModel redmodel){
         for (Star s : stars){
-            if (s.team == 0) // neutral
-                s.draw(neutralmodel);
-            else if (s.team == 1) //blue
-                s.draw(bluemodel);
-            else if (s.team == 2) //red
-                s.draw(redmodel);
+            s.draw(neutralmodel,bluemodel,redmodel);
         }
     }
 }
