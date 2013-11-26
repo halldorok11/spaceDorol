@@ -51,8 +51,8 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Space variables
     private int numberOfSectors = 100; //10x10x10
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
-    private int starsInSector = 100; //30
-    private int sectorSize = 3000;  //1000
+    private int starsInSector = 30; //30
+    private int sectorSize = 1000;  //1000
 
     //Player 1
     private Player p1;
@@ -76,6 +76,10 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Different textures for different 3D objects
     private Texture shuttleTexture;
 	private Texture backgroundTexture;
+
+    //Game score
+    private int blueScore = 0;
+    private int redScore = 0;      // number of sectors the teams have claimed
 
 
     @Override
@@ -319,6 +323,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         updatePlayer();
         updateProjectiles();
+        updateScore();
 
         if (p1.speed.length() > 0){
             //Broadcast the new position
@@ -341,7 +346,28 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    private void updateScore(){
+        blueScore = 0;
+        redScore = 0;
+        for (int i = 1; i < 4; i++){
+            for (int j = 1; j < 4 ; j++){
+                for (int k = 1; k < 4 ; k++){
+                    if (sectors[i][j][k].claimedBy == 1){
+                        blueScore += 1;
+                    }
+                    else if (sectors[i][j][k].claimedBy == 2){
+                        redScore += 1;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This function checks for any collision and updates the world accordingly
+     */
     private void hit(){
+
     }
 
     private void drawEnvironment() {
@@ -452,13 +478,8 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         //lighting making a mess of the letters
         Gdx.gl11.glDisable(GL11.GL_LIGHTING);
-
         this.spriteBatch.setProjectionMatrix(this.secondCamera.combined);
         secondCamera.update();
-
-        Vector3D v = Vector3D.sum(p1.n,new Vector3D(0,0,0)); //n
-        v.normalize();
-
         this.spriteBatch.begin();
         font.setColor(1f,1f,1f,1f);
         font.setScale(1,1);
@@ -467,7 +488,13 @@ public class TheGame implements ApplicationListener, InputProcessor
         font.draw(this.spriteBatch, String.format("Current sector coordinates: (%d,%d,%d)", (int)p1.eye.x / sectorSize, (int)p1.eye.y / sectorSize, (int)p1.eye.z / sectorSize), -400, -300);
         font.draw(this.spriteBatch, String.format("Current sector: %d", currentSectorIndex()), -400, -320);
         font.draw(this.spriteBatch, String.format("Frames per second: %d", Gdx.graphics.getFramesPerSecond()), -400, -340);
-        font.draw(this.spriteBatch, String.format("p1.n: (%f,%f,%f)", v.x,v.y,v.z), -400, -360);
+
+        font.setColor(0.6f,0.6f,1f,1f);
+        font.draw(this.spriteBatch, String.format("%d",blueScore),-20,400);
+        font.setColor(1f,1f,1f,1f);
+        font.draw(this.spriteBatch, String.format("::"), -1,400);
+        font.setColor(1f,0.6f,0.6f,1f);
+        font.draw(this.spriteBatch, String.format("%d", redScore), 20,400);
         this.spriteBatch.end();
 
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
@@ -510,8 +537,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 			    startMenu(); //..... for now
 			    break;
 	    }
-
-     }
+    }
 
 	public void helpMenu()
 	{

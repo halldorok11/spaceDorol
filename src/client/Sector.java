@@ -14,6 +14,7 @@ public class Sector {
     private Random rand;
     private Texture tex;
     private StillModel model;
+    public int claimedBy = 0; //1 for blue , 2 for red
 
     public Sector(int x, int y, int z,int size,int nr_of_stars){
         this.x = x;
