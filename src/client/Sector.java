@@ -25,6 +25,15 @@ public class Sector {
         generateStars(nr_of_stars);
     }
 
+	public Sector(Sector anotherSector, int x, int y, int z)
+	{
+		this.stars = anotherSector.stars;
+		this.size = anotherSector.size;
+		this.x = x;
+		this.y = y;
+		this.z = z;
+	}
+
     private void generateStars(int nr_of_stars){
         stars = new ArrayList<Star>();
         for (int i = 0; i < nr_of_stars; i++){
