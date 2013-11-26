@@ -30,6 +30,7 @@ public class Player
     Spaceship ship;
 
     public int team = 0;
+    public boolean shot = false;
 
 	public Player(Point3D pEye, Point3D pLookat, Vector3D up, Spaceship ship) {
 		eye = pEye;

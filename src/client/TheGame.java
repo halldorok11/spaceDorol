@@ -57,6 +57,9 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Player 1
     private Player p1;
     private List<Projectile> projectiles;
+    private long shottime;
+    private long cooldowntime = 10000; //10.000 milliseconds to "respawn"
+    private long timeleft;
 
     // text
     private SpriteBatch spriteBatch;
@@ -315,10 +318,12 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void shoot(){
+        if (p1.shot) return; //should not be able to shoot
+
         Vector3D forward = new Vector3D(-p1.n.x, -p1.n.y, -p1.n.z);
         forward.normalize();
 
-        Point3D location = new Point3D(p1.eye.x + forward.x*4, p1.eye.y + forward.y*4, p1.eye.z + forward.z*4);
+        Point3D location = new Point3D(p1.eye.x + forward.x*11, p1.eye.y + forward.y*11, p1.eye.z + forward.z*11);
 
         Vector3D speed = Vector3D.sum(p1.speed, forward);
 
@@ -400,6 +405,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         updateProjectiles();
         updateScore();
         hit();
+        updateTime();
 
         if (p1.speed.length() > 0){
             //Broadcast the new position
@@ -465,7 +471,44 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     private void collisionPlayerProjectile(){
+        Sector playerSector = currentSector();
+        Projectile theone = null;
 
+        for(Projectile projectile : projectiles)
+        {
+            Sector projectileSector = getSectorForAbsoluteCoordinates(projectile.position.x,projectile.position.y,projectile.position.z);
+            if (playerSector == projectileSector){
+                Vector3D diff = Vector3D.difference(projectile.position, p1.eye);
+                float len = diff.length();
+                if (len < 10){
+                    p1.shot = true;
+                    shottime = System.currentTimeMillis();
+                    theone = projectile;
+                }
+            }
+        }
+        if (theone != null){
+            projectiles.remove(theone);
+        }
+
+        //Network projectiles
+        NetworkProjectile theotherone = null;
+        for(NetworkProjectile projectile : NetworkGameState.instance().getProjectiles())
+        {
+            Sector projectileSector = getSectorForAbsoluteCoordinates(projectile.position.x,projectile.position.y,projectile.position.z);
+            if (playerSector == projectileSector){
+                Vector3D diff = Vector3D.difference(projectile.position, p1.eye);
+                float len = diff.length();
+                if (len < 10){
+                    p1.shot = true;
+                    shottime = System.currentTimeMillis();
+                    theotherone = projectile;
+                }
+            }
+        }
+        if (theotherone != null){
+            NetworkGameState.instance().getProjectiles().remove(theone);
+        }
     }
 
     private void collisionProjectileStar(){
@@ -512,6 +555,17 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    {
 		    NetworkGameState.instance().getProjectiles().remove(p);
 	    }
+    }
+
+    private void updateTime(){
+        if (!p1.shot) return;
+
+        timeleft = cooldowntime-(System.currentTimeMillis()-shottime);
+
+        if (timeleft < 0){
+            p1.shot = false;
+        }
+
     }
 
 
@@ -648,7 +702,15 @@ public class TheGame implements ApplicationListener, InputProcessor
         font.draw(this.spriteBatch, String.format("::"), -1,400);
         font.setColor(1f,0.6f,0.6f,1f);
         font.draw(this.spriteBatch, String.format("%d", redScore), 20,400);
+
+        if (p1.shot){
+            font.setColor(1f,1f,1f,1f);
+            font.draw(this.spriteBatch, String.format("You have been shot!"), -40, 100);
+            font.draw(this.spriteBatch, String.format("Weapon system will be back online in %.2f seconds", (float)timeleft/1000), -120, 80);
+        }
+
         this.spriteBatch.end();
+
 
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
     }
