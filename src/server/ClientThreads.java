@@ -1,7 +1,11 @@
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class ClientThreads {
+
+        private Random rand;
+        public int seed;
         
         private static ClientThreads instance;
         
@@ -9,6 +13,8 @@ public class ClientThreads {
         
         private ClientThreads(){
                 this.clientThreads = new LinkedList<ClientThread>();
+                rand = new Random();
+                seed = rand.nextInt();
         }
         
         public static ClientThreads instance() {
@@ -58,5 +64,9 @@ public class ClientThreads {
                                 continue;
                         c.sendMessage(String.format("exit;%s", clientThread.getNick()));
                 }
+        }
+
+        public void newSeed(){
+            seed = rand.nextInt();
         }
 }

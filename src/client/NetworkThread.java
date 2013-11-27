@@ -13,6 +13,7 @@ public class NetworkThread extends Thread {
     PrintWriter out = null;
     BufferedReader in = null;
     private  boolean alive;
+    public int seed = 0;
 
 
     public NetworkThread() {
@@ -54,6 +55,10 @@ public class NetworkThread extends Thread {
                 // We assume that the network messages are on csv format.
                 String[] tokens = message.split(";");
                 String name = tokens[1];
+
+                if(tokens[0].equals("seed")){
+                    int seed = Integer.parseInt(tokens[1]);
+                }
 
                 if(tokens[0].equals("online")) {
                     int team = Integer.parseInt(tokens[2]);

@@ -14,7 +14,6 @@ public class Sector {
     private int zOffset;
     public List<Star> stars;
     private int size;
-    private Random rand;
     private Texture tex;
     private StillModel model;
     public int claimedBy = 0; //0 for neutral, 1 for blue , 2 for red
@@ -30,16 +29,15 @@ public class Sector {
         zOffset = this.z - mirror.z;
     }
 
-    public Sector(int x, int y, int z,int size,int nr_of_stars){
+    public Sector(int x, int y, int z,int size,int nr_of_stars, Random rand){
         this.x = x;
         this.y = y;
         this.z = z;
         this.size = size;
-        rand = new Random();
-        generateStars(nr_of_stars);
+        generateStars(nr_of_stars,rand);
     }
 
-    private void generateStars(int nr_of_stars){
+    private void generateStars(int nr_of_stars, Random rand){
         stars = new ArrayList<Star>();
         for (int i = 0; i < nr_of_stars; i++){
             stars.add(new Star(rand.nextFloat()*size + x, rand.nextFloat()*size + y, rand.nextFloat()*size + z, 8f));

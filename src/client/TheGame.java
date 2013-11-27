@@ -18,13 +18,12 @@ import java.util.Random;
  */
 public class TheGame implements ApplicationListener, InputProcessor
 {
-    Random dummy = new Random(10);
-
     //networking:
     private NetworkThread network;
 
     //gamemode:
     GameState gameState;
+    Random rand;
 
     //Controls
     private int sensitivity = 30;
@@ -75,14 +74,6 @@ public class TheGame implements ApplicationListener, InputProcessor
      * It does some initializing and first time settings
      */
     public void create() {
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
-        System.out.println(dummy.nextFloat());
         // Kickstart the network thread
         network = new NetworkThread();
         network.start();
@@ -117,8 +108,6 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 	    loadModels();
 
-        //camera
-        p1 = new Player(new Point3D(0.0f, 0.0f, 0.0f), new Point3D(-2.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
         initialize();
     }
 
@@ -164,11 +153,16 @@ public class TheGame implements ApplicationListener, InputProcessor
      * Initializes the Sectors and generates the stars
      */
     private void initialize(){
+        rand = new Random(network.seed);
+
+        p1 = new Player(new Point3D(0.0f, 0.0f, 0.0f), new Point3D(-2.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
+
         sectors = new Sector[numberOfSectors][numberOfSectors][numberOfSectors]; //n * n * n
 
         generateSectors();
 
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
+        p1.speed = new Vector3D(0,0,0);
         projectiles = new ArrayList<Projectile>();
     }
 
@@ -208,7 +202,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         if (x >= 0 && y >= 0 && z >= 0){
             if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
                 if (sectors[x][y][z] == null){
-                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector);
+                    sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectorSize, starsInSector, rand);
                 }
             }
         }
@@ -484,6 +478,14 @@ public class TheGame implements ApplicationListener, InputProcessor
                     }
                 }
             }
+        }
+        victory();
+    }
+
+    private void victory(){
+        if (blueScore >= 10 || redScore >= 10){
+            network.sendMessage("newseed");
+            gameState = GameState.VICTORY;
         }
     }
 
@@ -767,11 +769,11 @@ public class TheGame implements ApplicationListener, InputProcessor
         font.draw(this.spriteBatch, String.format("Frames per second: %d", Gdx.graphics.getFramesPerSecond()), -400, -340);
 
         font.setColor(0.6f,0.6f,1f,1f);
-        font.draw(this.spriteBatch, String.format("%d",blueScore),-20,400);
+        font.draw(this.spriteBatch, String.format("%d/10",blueScore),-40,400);
         font.setColor(1f,1f,1f,1f);
         font.draw(this.spriteBatch, String.format("::"), -1,400);
         font.setColor(1f,0.6f,0.6f,1f);
-        font.draw(this.spriteBatch, String.format("%d", redScore), 20,400);
+        font.draw(this.spriteBatch, String.format("%d/10", redScore), 20,400);
 
         if (p1.shot){
             font.setColor(1f,1f,1f,1f);
@@ -824,6 +826,9 @@ public class TheGame implements ApplicationListener, InputProcessor
 			    //update();
 			    startMenu(); //..... for now
 			    break;
+            case VICTORY:
+                VictoryScreen();
+                break;
 	    }
     }
 
@@ -878,21 +883,27 @@ public class TheGame implements ApplicationListener, InputProcessor
      */
 	public void startMenu()
 	{
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+
         Gdx.gl11.glDisable(GL11.GL_LIGHTING);
 		Gdx.gl11.glClearColor(0,0,0,1);
 		Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
 
+        this.spriteBatch.setProjectionMatrix(this.secondCamera.combined);
+        secondCamera.update();
+
 		this.spriteBatch.begin();
-        spriteBatch.draw(backgroundTexture,0,0,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        spriteBatch.draw(backgroundTexture, -width/2, -height/2,width, height); //the middle is at coords 0,0
 		font.setColor(1, 1, 1, 1f);
-		font.draw(this.spriteBatch, String.format("WELCOME TO SPACE-DOROL!"), Gdx.graphics.getWidth() / 2 - 100, 600);
-        font.setColor(0.7f, 0.7f, 1, 1f);
-        font.draw(this.spriteBatch, String.format("Press B to join the game as a member of the blue team"), 130, 550);
-        font.setColor(1, 0.7f, 0.7f, 1f);
-		font.draw(this.spriteBatch, String.format("Press R to join the game as a member of the red team"), 130, 500);
+		font.draw(this.spriteBatch, String.format("WELCOME TO SPACE-DOROL!"), -100, 200);
+        font.setColor(0.6f, 0.6f, 1, 1f);
+        font.draw(this.spriteBatch, String.format("Press B to join the game as a member of the blue team"), -430, 150);
+        font.setColor(1, 0.6f, 0.6f, 1f);
+		font.draw(this.spriteBatch, String.format("Press R to join the game as a member of the red team"), -430, 100);
         font.setColor(1, 1, 1, 1f);
-		font.draw(this.spriteBatch, String.format("Use W-A-S-D along with the mouse to navigate in space"), 130, 350);
-		font.draw(this.spriteBatch, String.format("Press 'M' for in-game options!"), 130, 300);
+		font.draw(this.spriteBatch, String.format("Use W-A-S-D along with the mouse to navigate in space"), -430, 50);
+		font.draw(this.spriteBatch, String.format("Press 'M' for in-game options!"), -430, 0);
 		this.spriteBatch.end();
 
         if(Gdx.input.isKeyPressed(Input.Keys.B)){
@@ -912,6 +923,40 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 
 	}
+
+    private void VictoryScreen(){
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+
+        Gdx.gl11.glDisable(GL11.GL_LIGHTING);
+        Gdx.gl11.glClearColor(0,0,0,1);
+        Gdx.gl11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
+
+        this.spriteBatch.begin();
+        spriteBatch.draw(backgroundTexture, -width/2, -height/2,width, height); //the middle is at coords 0,0
+
+        if (blueScore >= 10)
+            font.setColor(0.6f, 0.6f, 1f, 1f);
+        if (redScore >= 10)
+            font.setColor(1f, 0.6f, 0.6f, 1f);
+
+        font.draw(this.spriteBatch, String.format("VICTORY!"), -100, 200);
+
+        if (blueScore >= 10)
+            font.draw(this.spriteBatch, String.format("The Blue team won the game"),-150, 0);
+        if (redScore >= 10)
+            font.draw(this.spriteBatch, String.format("The Red team won the game"), -150, 0);
+
+        font.draw(this.spriteBatch, String.format("Press 'Q' to quit to main menu and play another round"), -170, -20);
+        this.spriteBatch.end();
+
+        if(Gdx.input.isKeyPressed(Input.Keys.Q)){
+            initialize();
+            this.gameState = GameState.START;
+        }
+
+        Gdx.gl11.glEnable(GL11.GL_LIGHTING);
+    }
 
     @Override
     public void resize(int arg0, int arg1) {

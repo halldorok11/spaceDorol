@@ -72,13 +72,15 @@ public class ClientThread extends Thread {
                 
                 // We add ourself to the client thread collection.
                 ClientThreads.instance().add(this);
+
+                this.sendMessage(String.format("seed;%d",ClientThreads.instance().seed));
                 
                 // Send the client information for all the players that are currently connected.
                 List<String> connectedPlayers = ClientThreads.instance().getListOfConnectedPlayers();
                 
                 // Remove my name from the list.
                 connectedPlayers.remove(this.nick);
-                
+
                 for(String p : connectedPlayers) {
                         this.sendMessage(String.format("online;%s", p));
                 }
@@ -119,6 +121,10 @@ public class ClientThread extends Thread {
                                 if (action.equals("team")){
                                     String p = String.format("team;%s;%s",this.nick,tokens[1]);
                                     ClientThreads.instance().broadcast(this,p);
+                                }
+
+                                if (action.equals("newseed")){
+                                    ClientThreads.instance().newSeed();
                                 }
                         } 
                         catch (IOException e) {

@@ -9,5 +9,5 @@
  */
 public enum GameState
 {
-	START, PLAYING, MENU
+	START, PLAYING, MENU, VICTORY
 }
