@@ -24,7 +24,7 @@ How to get it started:
 13. Build -> Rebuild project.
 14. Open the DesktopStarter class.
 15. Run the project with shift+f10, select the DesktopStarter class as the default running class.
-16. Project can now be run by shift+f10.
+16. The game can now be run from Intellij. Just make sure there is one server (src/server/ServerRunner) running for you to connect to.
 
 ##Gameplay
 In the beginning, choose a team.
@@ -41,6 +41,7 @@ But don't get shot!, friendly fire is just a word.
 * Mouse : turn
 * ESCAPE : quit game
 * M : help menu
+* TAB : Scoreboard
 
 ##Development information
 The projects was built in Intellij.
@@ -57,7 +58,9 @@ Spheres.
 There are two different textures for missiles, blue and red.
 
 ###The World
-The World is a 3x3x3 cube of sectors.
+The World is an "infinite" 3x3x3 cube of sectors.
+In the sense that if you go outside the cube you will be transported to the opposite side.
+So you will never be aware that you are "going off the edge"
 
 ###Sector
 A 3D cube area in space, containing a number of stars.

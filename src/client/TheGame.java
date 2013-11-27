@@ -167,7 +167,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     /**
-     * This genereates all the sectors
+     * This generates all the sectors
      * Needs to be split in two:
      *      First we need to generate all the non-mirrors.
      *      Then generate all the mirrors.
@@ -254,18 +254,6 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
     /**
-     * Returns at what index the current sector is
-     * @return the index
-     */
-    private int currentSectorIndex(){
-        int x = currentXSector();
-        int y = currentYSector();
-        int z = currentZSector();
-
-        return x*numberOfSectors*numberOfSectors + y*numberOfSectors + z;
-    }
-
-    /**
      * Used to calculate the current x axis index of the current sector
      * @return the x axis index of the current sector
      */
@@ -313,6 +301,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     /**
      * This is called whenever the player presses the 'shoot' key.
      * Makes a new missile and sends it on it's way.
+     * And notifies the server about a new projectile
      */
     private void shoot(){
         if (p1.shot) return; //should not be able to shoot
@@ -340,6 +329,11 @@ public class TheGame implements ApplicationListener, InputProcessor
         shuttle.dispose();
         shuttleTexture.dispose();
         backgroundTexture.dispose();
+        neutralplanet.dispose();
+        blueplanet.dispose();
+        redplanet.dispose();
+        redProjectileModel.dispose();
+        blueProjectileModel.dispose();
     }
 
     @Override
@@ -397,6 +391,7 @@ public class TheGame implements ApplicationListener, InputProcessor
             p1.eye.x = p1.eye.y = p1.eye.z = 0;
         }
 
+        //Now update all positions of objects
         updateSector();
         updatePlayer();
         updateProjectiles();
@@ -482,6 +477,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         victory();
     }
 
+    /**
+     * This function checks for victory and then, sets the game in the VICTORY state
+     * And tells the server to create a new seed.
+     */
     private void victory(){
         if (blueScore >= 10 || redScore >= 10){
             network.sendMessage("newseed");
@@ -781,6 +780,24 @@ public class TheGame implements ApplicationListener, InputProcessor
             font.draw(this.spriteBatch, String.format("Weapon system will be back online in %.2f seconds", (float)timeleft/1000), -120, 80);
         }
 
+        if (Gdx.input.isKeyPressed(Input.Keys.TAB)){
+            int x = 300;
+            int y = 300;
+            font.setColor(1f,1f,1f,1f);
+            font.draw(this.spriteBatch, String.format("Claimed sectors:"), x - 30, y);
+            for (int i = 1; i < numberOfSectors-1 ; i++){
+                for (int j = 1; j < numberOfSectors-1 ; j++){
+                    for (int k = 1; k < numberOfSectors-1 ; k++){
+                        y -= 20;
+                        if (sectors[i][j][k].claimedBy == 0) font.setColor(1f,   1f,   1f,   1f);
+                        if (sectors[i][j][k].claimedBy == 1) font.setColor(0.6f, 0.6f, 1f,   1f);
+                        if (sectors[i][j][k].claimedBy == 2) font.setColor(1f,   0.6f, 0.6f, 1f);
+                        font.draw(this.spriteBatch, String.format("(%d,%d,%d)", i,j,k), x, y);
+                    }
+                }
+            }
+        }
+
         this.spriteBatch.end();
 
 
@@ -818,8 +835,8 @@ public class TheGame implements ApplicationListener, InputProcessor
 			    break;
 
 		    case MENU:
+                update();
 			    helpMenu();
-			    //displayMenu();
 			    break;
 
 		    case START:
@@ -924,6 +941,9 @@ public class TheGame implements ApplicationListener, InputProcessor
 
 	}
 
+    /**
+     * Displays the Victory screen
+     */
     private void VictoryScreen(){
         int width = Gdx.graphics.getWidth();
         int height = Gdx.graphics.getHeight();

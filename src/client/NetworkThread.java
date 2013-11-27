@@ -1,3 +1,5 @@
+import com.badlogic.gdx.Gdx;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,6 +33,8 @@ public class NetworkThread extends Thread {
         catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
+            System.out.println("Unable to connect to server");
+            Gdx.app.exit();
         }
     }
 
