@@ -60,7 +60,8 @@ public class TheGame implements ApplicationListener, InputProcessor
     ObjLoader loader;
 
     //Different textures for different 3D objects
-    private Texture shuttleTexture;
+    private Texture blueShuttleTexture;
+    private Texture redShuttleTexture;
 	private Texture backgroundTexture;
 
     //Game score
@@ -103,8 +104,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 
         //assign images to the textures
-        shuttleTexture = new Texture("graphics/cruiser/Textures/cruiser.png");
-	    backgroundTexture = new Texture ("graphics/space_background.png");
+        blueShuttleTexture = new Texture("graphics/cruiser/Textures/bluecruiser.png");
+        redShuttleTexture = new Texture("graphics/cruiser/Textures/redcruiser.png");
+        backgroundTexture = new Texture ("graphics/space_background.png");
 
 	    loadModels();
 
@@ -155,7 +157,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     private void initialize(){
         rand = new Random(network.seed);
 
-        p1 = new Player(new Point3D(0.0f, 0.0f, 0.0f), new Point3D(-2.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f), new Spaceship(shuttle,shuttleTexture));
+        p1 = new Player(new Point3D(0.0f, 0.0f, 0.0f), new Point3D(-2.0f, 0.0f, 0.0f), new Vector3D(0.0f, 1.0f, 0.0f));
 
         sectors = new Sector[numberOfSectors][numberOfSectors][numberOfSectors]; //n * n * n
 
@@ -327,7 +329,8 @@ public class TheGame implements ApplicationListener, InputProcessor
      */
     public void dispose() {
         shuttle.dispose();
-        shuttleTexture.dispose();
+        blueShuttleTexture.dispose();
+        redShuttleTexture.dispose();
         backgroundTexture.dispose();
         neutralplanet.dispose();
         blueplanet.dispose();
@@ -752,8 +755,6 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         drawEnvironment();
 
-        p1.draw();
-
         //Write the text on the screen:
 
         //lighting making a mess of the letters
@@ -814,7 +815,10 @@ public class TheGame implements ApplicationListener, InputProcessor
             Gdx.gl10.glTranslatef(p.position.x, p.position.y,p.position.z);
             //Gdx.gl10.glRotatef(180,0,0,0);
             Gdx.graphics.getGL10().glEnable(GL10.GL_TEXTURE_2D);
-            //shuttleTexture.bind();
+            if (p.team == 1)
+                blueShuttleTexture.bind();
+            if (p.team == 2)
+                redShuttleTexture.bind();
             shuttle.render();
             Gdx.gl10.glPopMatrix();
         }

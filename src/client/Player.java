@@ -33,7 +33,7 @@ public class Player
     public int team = 0;
     public boolean shot = false;
 
-	public Player(Point3D pEye, Point3D pLookat, Vector3D up, Spaceship ship) {
+	public Player(Point3D pEye, Point3D pLookat, Vector3D up) {
 		eye = pEye;
 		n = Vector3D.difference(pEye, pLookat);
 		n.normalize();
@@ -42,7 +42,6 @@ public class Player
 		v = Vector3D.cross(n, u);
 
         speed = new Vector3D(0,0,0);
-        this.ship = ship;
 	}
 	
 	public void setModelViewMatrix() {
