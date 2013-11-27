@@ -1,30 +1,13 @@
-
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.audio.AudioDevice;
-import com.badlogic.gdx.audio.AudioRecorder;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g3d.AnimatedModelInstance;
-import com.badlogic.gdx.graphics.g3d.StillModelInstance;
 import com.badlogic.gdx.graphics.g3d.loaders.wavefront.ObjLoader;
-import com.badlogic.gdx.graphics.g3d.materials.Material;
-import com.badlogic.gdx.graphics.g3d.model.Model;
 import com.badlogic.gdx.graphics.g3d.model.still.StillModel;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
-import com.badlogic.gdx.math.collision.BoundingBox;
-import com.badlogic.gdx.utils.Array;
 
-import java.io.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
-import java.io.InputStream;
 
 /**
  * This is the "main" class that "plays" and runs the game.
@@ -51,7 +34,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     //Space variables
     private int numberOfSectors = 3; //n x n x n
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
-    private int starsInSector = 40; //30
+    private int starsInSector = 30; //30
     private int sectorSize = 1000;  //1000
 
     //Player 1
@@ -294,6 +277,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         int y = currentYSector();
         int z = currentZSector();
 
+        if (x < 0 || x >= numberOfSectors) return null;
+        if (y < 0 || y >= numberOfSectors) return null;
+        if (z < 0 || z >= numberOfSectors) return null;
+
         return sectors[x][y][z];
     }
 
@@ -315,6 +302,21 @@ public class TheGame implements ApplicationListener, InputProcessor
 
     private int currentZSector(){
         return (int)p1.eye.z / sectorSize;
+    }
+
+    private Sector getSectorForAbsoluteCoordinates(float x, float y, float z)
+    {
+
+        int sectorX = (int)x/sectorSize;
+        int sectorY = (int)y/sectorSize;
+        int sectorZ = (int)z/sectorSize;
+
+        if(sectorX >= 0 && sectorY >= 0 && sectorZ >= 0)
+        {
+            if(sectorX < numberOfSectors && sectorY < numberOfSectors && sectorZ < numberOfSectors)
+                return sectors[sectorX][sectorY][sectorZ];
+        }
+        return null;
     }
 
     private void shoot(){
@@ -434,7 +436,6 @@ public class TheGame implements ApplicationListener, InputProcessor
         p1.update();
         if (currentSector() != p1.currentSector){
             p1.currentSector = currentSector();
-            //generateSector(p1.currentSector);
         }
     }
 
@@ -459,6 +460,7 @@ public class TheGame implements ApplicationListener, InputProcessor
      * This function checks for any collision and updates the world accordingly
      */
     private void hit(){
+        if (currentSector() == null) return; //no collisions outside of the warzone
         //player to star collision
         collisionPlayerStar();
 
@@ -487,6 +489,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         for(Projectile projectile : projectiles)
         {
             Sector projectileSector = getSectorForAbsoluteCoordinates(projectile.position.x,projectile.position.y,projectile.position.z);
+            if (projectileSector == null) continue;
             if (playerSector == projectileSector){
                 Vector3D diff = Vector3D.difference(projectile.position, p1.eye);
                 float len = diff.length();
@@ -506,6 +509,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         for(NetworkProjectile projectile : NetworkGameState.instance().getProjectiles())
         {
             Sector projectileSector = getSectorForAbsoluteCoordinates(projectile.position.x,projectile.position.y,projectile.position.z);
+            if (projectileSector == null) continue;
             if (playerSector == projectileSector){
                 Vector3D diff = Vector3D.difference(projectile.position, p1.eye);
                 float len = diff.length();
@@ -529,6 +533,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    for(Projectile p : projectiles)
 	    {
 		    Sector s = getSectorForAbsoluteCoordinates(p.position.x,p.position.y,p.position.z);
+            if (s == null) continue;
 		    for(Star star : s.stars)
 		    {
 			    Vector3D diff = Vector3D.difference(p.position, star.pos);
@@ -550,6 +555,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    for(NetworkProjectile p : NetworkGameState.instance().getProjectiles())
 	    {
 		    Sector s = getSectorForAbsoluteCoordinates(p.position.x,p.position.y,p.position.z);
+            if (s == null) continue;
 		    for(Star star : s.stars)
 		    {
 			    Vector3D diff = Vector3D.difference(p.position, star.pos);
@@ -600,14 +606,6 @@ public class TheGame implements ApplicationListener, InputProcessor
                 }
             }
         }
-	   /* for(int i = 0; i < numberOfSectors; i++)
-	    {
-		    for(int j = 0; j < numberOfSectors; j++)
-		    {
-			    for(int k = 0; k < numberOfSectors; k++)
-				    drawSector(i,j,k);
-		    }
-	    } */
     }
 
     private void drawSector(int x, int y, int z){
@@ -842,21 +840,6 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 
-	}
-
-	private Sector getSectorForAbsoluteCoordinates(float x, float y, float z)
-	{
-
-		int sectorX = (int)x/sectorSize;
-		int sectorY = (int)y/sectorSize;
-		int sectorZ = (int)z/sectorSize;
-
-		if(sectorX >= 0 && sectorY >= 0 && sectorZ >= 0)
-		{
-			if(sectorX < numberOfSectors && sectorY < numberOfSectors && sectorZ < numberOfSectors)
-				return sectors[sectorX][sectorY][sectorZ];
-		}
-		return null;
 	}
 
     @Override
