@@ -46,21 +46,21 @@ But don't get shot!, friendly fire is just a word.
 The projects was built in Intellij.
 
 ###3D objects
-All models are from http://tf3dm.com/
+All models are from http://tf3dm.com/.
 
 ###Moons
-Spheres
+Spheres.
 There are three different coloured textures for the moon, blue, red and grey.
 
 ###Missiles
-Spheres
-There are two different textures for missiles, blue and red
+Spheres.
+There are two different textures for missiles, blue and red.
 
 ###The World
 The World is a 3x3x3 cube of sectors.
 
 ###Sector
-A 3D cube area in space, containing a number of stars
+A 3D cube area in space, containing a number of stars.
 
 ###Star Generation
 Each sector randomly generates the locations of each star within him.
@@ -68,9 +68,9 @@ Each sector randomly generates the locations of each star within him.
 ###Collision
 There are three kinds of collision:
 Missile to player:
-	The missile is deleted and the player is inactive for 10 seconds
+	The missile is deleted and the player is inactive for 10 seconds.
 Missile to star:
-	The missile is deleted and paints the star with the missiles team color
+	The missile is deleted and paints the star with the missiles team color.
 Player to star:
 	The player will be pushed back to maintain a minimum fixed length from the star.
 
