@@ -3,7 +3,10 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.Gdx;
 
-
+/**
+ * The player class
+ * Holds all information needed for a new player
+ */
 public class Player
 {
     //Position

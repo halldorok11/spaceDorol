@@ -23,10 +23,6 @@ public class TheGame implements ApplicationListener, InputProcessor
     //gamemode:
     GameState gameState;
 
-    //Audio
-    Audio menutune;
-    Audio gametune;
-
     //Controls
     private int sensitivity = 30;
     private int inverted = 1; //used for mouse camera controls
@@ -113,6 +109,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         initialize();
     }
 
+    /**
+     * Loads the models to be used for drawing.
+     */
     private void loadModels(){
         loader = new ObjLoader();
         FileHandle in;
@@ -148,6 +147,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Initializes the Sectors and generates the stars
+     */
     private void initialize(){
         sectors = new Sector[numberOfSectors][numberOfSectors][numberOfSectors]; //n * n * n
 
@@ -156,96 +158,11 @@ public class TheGame implements ApplicationListener, InputProcessor
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
         p1.currentSector = sectors[1][1][1];
         projectiles = new ArrayList<Projectile>();
-
-        /*
-	    // Add mirrored sectors on the edges
-	    for(int x = 0; x < numberOfSectors; x++)
-	    {
-	        for(int y = 0; y < numberOfSectors; y++)
-	        {
-		        for(int z = 1; z < numberOfSectors-1; z++)
-		        {
-			        if((x>=1 && x<=3) && (y>=1 && y<=3))
-				        continue;
-
-					if(x == 0 && y == 0) //corner 1
-						sectors[x][y][z] = new Sector(sectors[3][3][z],x*sectorSize,y*sectorSize,z*sectorSize);
-			        else if(x == 4 && y == 0) //corner 2
-			            sectors[x][y][z] = new Sector(sectors[1][3][z],x*sectorSize,y*sectorSize,z*sectorSize);
-			        else if(x == 0 && y == 4) //corner 3
-			            sectors[x][y][z] = new Sector(sectors[3][1][z],x*sectorSize,y*sectorSize,z*sectorSize);
-			        else if(x == 4 && y == 4) //corner 4
-			            sectors[x][y][z] = new Sector(sectors[1][1][z],x*sectorSize,y*sectorSize,z*sectorSize);
-
-			        else  //normal edges
-					{
-						if(x == 0)
-							sectors[x][y][z] = new Sector(sectors[3][y][z],x*sectorSize,y*sectorSize,z*sectorSize);
-						else if(x == 4)
-							sectors[x][y][z] = new Sector(sectors[1][y][z],x*sectorSize,y*sectorSize,z*sectorSize);
-						else if(y == 0)
-							sectors[x][y][z] = new Sector(sectors[x][3][z],x*sectorSize,y*sectorSize,z*sectorSize);
-						else if(y == 4)
-							sectors[x][y][z] = new Sector(sectors[x][1][z],x*sectorSize,y*sectorSize,z*sectorSize);
-					}
-		        }
-	        }
-	    }
-	    // now add the plates on top and on bottom
-	    for(int x = 0; x < numberOfSectors; x++)
-	    {
-		    for(int y = 0; y < numberOfSectors; y++)
-		    {
-			    for(int z = 0; z < numberOfSectors; z += 4)
-			    {
-				    if((x>=1 && x<=3) && (y>=1 && y<=3)) //non edge cases
-				        sectors[x][y][z] = new Sector(sectors[x][y][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-
-				    else
-				    {
-					    if(x == 0 && y == 0)  //corner1
-						    sectors[x][y][z] = new Sector(sectors[3][3][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-					    else if(x == 4 && y == 0) //corner 2
-					        sectors[x][y][z] = new Sector(sectors[1][3][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-					    else if(x == 0 && y == 4) //corner 3
-					        sectors[x][y][z] = new Sector(sectors[3][1][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-					    else if(x == 4 && y == 4) //corner 4
-						    sectors[x][y][z] = new Sector(sectors[1][1][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-
-					    else  //normal edges
-					    {
-					        if(x == 0 || x == 4)
-						        sectors[x][y][z] = new Sector(sectors[Math.abs(3-x)][y][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-						    else if(y == 0 || y == 4)
-						        sectors[x][y][z] = new Sector(sectors[x][Math.abs(3-y)][Math.abs(3-z)],x*sectorSize,y*sectorSize,z*sectorSize);
-					    }
-				    }
-			    }
-		    }
-	    }*/
-
     }
 
     /**
-     * This should generate all the neighbour sectors to this one, completing a cube of sectors around it.
-     * @param sec the sector to be generated from
+     * This genereates all the sectors
      */
-    private void generateSector(Sector sec){
-        if (sec == null) return;
-
-        int x = sec.x/sectorSize;
-        int y = sec.y/sectorSize;
-        int z = sec.z/sectorSize;
-
-        for (int i = x-1; i <= x+1; i++){
-            for (int j = y-1; j <= y+1; j++){
-                for (int k = z-1; k <= z+1; k++){
-                    makeNewSector(i,j,k);
-                }
-            }
-        }
-    }
-
     private void generateSectors(){
         for (int i = 0; i <= numberOfSectors; i++){
             for (int j = 0; j <= numberOfSectors; j++){
@@ -271,7 +188,11 @@ public class TheGame implements ApplicationListener, InputProcessor
             }
         }
     }
-    
+
+    /**
+     * Used to calculate the current sector of the player
+     * @return the current sector
+     */
     private Sector currentSector(){
         int x = currentXSector();
         int y = currentYSector();
@@ -284,6 +205,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         return sectors[x][y][z];
     }
 
+    /**
+     * Returns at what index the current sector is
+     * @return the index
+     */
     private int currentSectorIndex(){
         int x = currentXSector();
         int y = currentYSector();
@@ -292,18 +217,37 @@ public class TheGame implements ApplicationListener, InputProcessor
         return x*numberOfSectors*numberOfSectors + y*numberOfSectors + z;
     }
 
+    /**
+     * Used to calculate the current x axis index of the current sector
+     * @return the x axis index of the current sector
+     */
     private int currentXSector(){
         return (int)p1.eye.x / sectorSize;
     }
 
+    /**
+     * Used to calculate the current y axis index of the current sector
+     * @return the y axis index of the current sector
+     */
     private int currentYSector(){
         return (int)p1.eye.y / sectorSize;
     }
 
+    /**
+     * Used to calculate the current y axis index of the current sector
+     * @return the y axis index of the current sector
+     */
     private int currentZSector(){
         return (int)p1.eye.z / sectorSize;
     }
 
+    /**
+     * Get the sector that contains the given coordinates
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z coordinate
+     * @return The sector that contains these coordinates
+     */
     private Sector getSectorForAbsoluteCoordinates(float x, float y, float z)
     {
 
@@ -319,6 +263,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         return null;
     }
 
+    /**
+     * This is called whenever the player presses the 'shoot' key.
+     * Makes a new missile and sends it on it's way.
+     */
     private void shoot(){
         if (p1.shot) return; //should not be able to shoot
 
@@ -422,6 +370,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         hit();
     }
 
+    /**
+     * Has all the sectors count their stars teams, and change the sector claim if it not same as last.
+     */
     private void updateSector(){
         for (int i = 0; i < numberOfSectors; i++){
             for (int j = 0; j < numberOfSectors ; j++){
@@ -432,6 +383,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Updates the player
+     */
     private void updatePlayer(){
         p1.update();
         if (currentSector() != p1.currentSector){
@@ -439,6 +393,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Counts the claimed sectors for display
+     */
     private void updateScore(){
         blueScore = 0;
         redScore = 0;
@@ -471,6 +428,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         collisionProjectileStar();
     }
 
+    /**
+     * Checks for collision between the player and a star.
+     * Keeps the player at a minimum distance from a star.
+     */
     private void collisionPlayerStar(){
         for (Star s : currentSector().stars){
             Vector3D diff = Vector3D.difference(p1.eye, s.pos);
@@ -482,6 +443,11 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Checks for collision between a Player and a Projectile
+     * Upon impact:
+     *      Delete the missile and render the player unable to shoot for some time
+     */
     private void collisionPlayerProjectile(){
         Sector playerSector = currentSector();
         Projectile theone = null;
@@ -525,6 +491,11 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Checks for collision between a Projectile and a Star
+     * Upon impact:
+     *      Deletes the missile and paints the star with the missiles team color
+     */
     private void collisionProjectileStar(){
 
 	    List<Projectile> removeList =  new ArrayList<Projectile>();
@@ -573,6 +544,9 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    }
     }
 
+    /**
+     * If the player was shot, this function takes care of the countdown
+     */
     private void updateTime(){
         if (!p1.shot) return;
 
@@ -585,6 +559,9 @@ public class TheGame implements ApplicationListener, InputProcessor
     }
 
 
+    /**
+     * Parent function of all drawings
+     */
     private void drawEnvironment() {
         drawSectors();
         drawProjectiles();
@@ -608,6 +585,12 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Draws a sector with the indices given
+     * @param x x index of the sector
+     * @param y y index of the sector
+     * @param z z index of the sector
+     */
     private void drawSector(int x, int y, int z){
         if (x >= 0 && y >= 0 && z >= 0){
             if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
@@ -618,6 +601,10 @@ public class TheGame implements ApplicationListener, InputProcessor
         }
     }
 
+    /**
+     * Updates the position of all missiles.
+     * If they have traveled to far, they will be deleted.
+     */
     private void updateProjectiles(){
         List<Integer> removables = new ArrayList<Integer>();
 
@@ -633,6 +620,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         NetworkGameState.instance().updateProjectiles();
     }
 
+    /**
+     * Draws all missiles.
+     */
     private void drawProjectiles(){
         for (Projectile p : projectiles){
             Gdx.gl10.glPushMatrix();
@@ -723,6 +713,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
     }
 
+    /**
+     * Gets all the players on the network and draws them.
+     */
     private void drawPlayers(){
 
         for (NetworkPlayer p : NetworkGameState.instance().getPlayers()){
@@ -762,6 +755,9 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    }
     }
 
+    /**
+     * Displays the in game help menu
+     */
 	public void helpMenu()
 	{
         int width = Gdx.graphics.getWidth();
@@ -805,6 +801,9 @@ public class TheGame implements ApplicationListener, InputProcessor
         Gdx.gl11.glEnable(GL11.GL_LIGHTING);
 	}
 
+    /**
+     * Displays the start menu
+     */
 	public void startMenu()
 	{
         Gdx.gl11.glDisable(GL11.GL_LIGHTING);
