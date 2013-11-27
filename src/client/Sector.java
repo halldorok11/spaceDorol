@@ -9,12 +9,26 @@ public class Sector {
     public int x;
     public int y;
     public int z;
+    private int xOffset;
+    private int yOffset;
+    private int zOffset;
     public List<Star> stars;
     private int size;
     private Random rand;
     private Texture tex;
     private StillModel model;
     public int claimedBy = 0; //0 for neutral, 1 for blue , 2 for red
+    public Sector mirror = null;
+
+    public Sector(int x, int y, int z, Sector mirror){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.mirror = mirror;
+        xOffset = this.x - mirror.x;
+        yOffset = this.y - mirror.y;
+        zOffset = this.z - mirror.z;
+    }
 
     public Sector(int x, int y, int z,int size,int nr_of_stars){
         this.x = x;
@@ -33,6 +47,7 @@ public class Sector {
     }
 
     public boolean claimCheck(){
+        if (mirror != null) return false; //this is a mirror sector
         int initialclaim = 10;
         int half = stars.size()/2;
         int red_count = 0;
@@ -78,8 +93,19 @@ public class Sector {
     }
 
     public void draw(StillModel neutralmodel,StillModel bluemodel, StillModel redmodel){
+        if (mirror == null){
+            for (Star s : stars){
+                s.draw(neutralmodel,bluemodel,redmodel);
+            }
+        }
+        else {
+            mirror.drawoffset(xOffset,yOffset,zOffset,neutralmodel,bluemodel,redmodel);
+        }
+    }
+
+    public void drawoffset(int x, int y, int z, StillModel neutralmodel,StillModel bluemodel, StillModel redmodel){
         for (Star s : stars){
-            s.draw(neutralmodel,bluemodel,redmodel);
+            s.drawoffset(x,y,z,neutralmodel,bluemodel,redmodel);
         }
     }
 }

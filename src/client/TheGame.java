@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g3d.model.still.StillModel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * This is the "main" class that "plays" and runs the game.
@@ -17,6 +18,8 @@ import java.util.List;
  */
 public class TheGame implements ApplicationListener, InputProcessor
 {
+    Random dummy = new Random(10);
+
     //networking:
     private NetworkThread network;
 
@@ -28,10 +31,12 @@ public class TheGame implements ApplicationListener, InputProcessor
     private int inverted = 1; //used for mouse camera controls
 
     //Space variables
-    private int numberOfSectors = 3; //n x n x n
+    private int numberOfSectors = 5; //n x n x n
     private int totalSectors = numberOfSectors*numberOfSectors*numberOfSectors;
-    private int starsInSector = 30; //30
-    private int sectorSize = 1000;  //1000
+    private int starsInSector = 60; //30
+    private int sectorSize = 2000;  //1000
+    private int maxposition = (numberOfSectors-1)*sectorSize;
+    private int minposition = 1*sectorSize;
 
     //Player 1
     private Player p1;
@@ -70,6 +75,14 @@ public class TheGame implements ApplicationListener, InputProcessor
      * It does some initializing and first time settings
      */
     public void create() {
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
+        System.out.println(dummy.nextFloat());
         // Kickstart the network thread
         network = new NetworkThread();
         network.start();
@@ -156,18 +169,30 @@ public class TheGame implements ApplicationListener, InputProcessor
         generateSectors();
 
         p1.eye.x = p1.eye.y = p1.eye.z = numberOfSectors*sectorSize/2;
-        p1.currentSector = sectors[1][1][1];
         projectiles = new ArrayList<Projectile>();
     }
 
     /**
      * This genereates all the sectors
+     * Needs to be split in two:
+     *      First we need to generate all the non-mirrors.
+     *      Then generate all the mirrors.
+     * If this would not be split then we would get a nullpointer exception trying to reference a mirror that doesn't exist
      */
     private void generateSectors(){
-        for (int i = 0; i <= numberOfSectors; i++){
-            for (int j = 0; j <= numberOfSectors; j++){
-                for (int k = 0; k <= numberOfSectors; k++){
-                    makeNewSector(i,j,k);
+        for (int i = 1; i < numberOfSectors-1 ; i++){
+            for (int j = 1; j < numberOfSectors-1 ; j++){
+                for (int k = 1; k < numberOfSectors-1 ; k++){
+                    makeRegularSector(i,j,k);
+                }
+            }
+        }
+
+
+        for (int i = 0; i < numberOfSectors; i++){
+            for (int j = 0; j < numberOfSectors; j++){
+                for (int k = 0; k < numberOfSectors; k++){
+                    makeMirrorSector(i,j,k);
                 }
             }
         }
@@ -179,7 +204,7 @@ public class TheGame implements ApplicationListener, InputProcessor
      * @param y second index into sectors
      * @param z third index into sectors
      */
-    private void makeNewSector(int x, int y, int z){
+    private void makeRegularSector(int x, int y, int z){
         if (x >= 0 && y >= 0 && z >= 0){
             if (x < numberOfSectors && y < numberOfSectors && z < numberOfSectors){
                 if (sectors[x][y][z] == null){
@@ -187,6 +212,35 @@ public class TheGame implements ApplicationListener, InputProcessor
                 }
             }
         }
+    }
+
+    /**
+     * Makes a mirror sector in the sectors array with the indicated indices
+     * @param x first index
+     * @param y second index
+     * @param z third index
+     */
+    private void makeMirrorSector(int x, int y, int z){
+        if (x == 0 || y == 0 || z == 0 || x == numberOfSectors-1 || y == numberOfSectors-1 || z == numberOfSectors-1){
+            if (sectors[x][y][z] == null){
+                sectors[x][y][z] = new Sector(x*sectorSize, y*sectorSize, z*sectorSize, sectors[mirrorindex(x)][mirrorindex(y)][mirrorindex(z)]);
+            }
+        }
+    }
+
+    /**
+     * This function changes an out of the box index to the mirror index
+     * Here is the conversion table:
+     * 0 -> numberofsectors-2
+     * numberofserctors-1 -> 1
+     *
+     * @param i the index that is out of bound
+     * @return the mirrored index
+     */
+    private int mirrorindex(int i){
+        if (i <= 0) return numberOfSectors-2;
+        if (i >= numberOfSectors-1) return 1;
+        return i;
     }
 
     /**
@@ -250,7 +304,6 @@ public class TheGame implements ApplicationListener, InputProcessor
      */
     private Sector getSectorForAbsoluteCoordinates(float x, float y, float z)
     {
-
         int sectorX = (int)x/sectorSize;
         int sectorY = (int)y/sectorSize;
         int sectorZ = (int)z/sectorSize;
@@ -388,9 +441,30 @@ public class TheGame implements ApplicationListener, InputProcessor
      */
     private void updatePlayer(){
         p1.update();
+        Playerextends();
         if (currentSector() != p1.currentSector){
             p1.currentSector = currentSector();
         }
+    }
+
+    /**
+     * This function checks if the player is outside the boundary's and then ports him to the other side.
+     */
+    private void Playerextends(){
+        extendPoint(p1.eye);
+    }
+
+    /**
+     * Extends a point to be within the pre determined world
+     * @param point the coordinate to be changed
+     */
+    private void extendPoint(Point3D point){
+        if (point.x < minposition) point.x = maxposition;
+        if (point.x > maxposition) point.x = minposition;
+        if (point.y < minposition) point.y = maxposition;
+        if (point.y > maxposition) point.y = minposition;
+        if (point.z < minposition) point.z = maxposition;
+        if (point.z > maxposition) point.z = minposition;
     }
 
     /**
@@ -417,7 +491,7 @@ public class TheGame implements ApplicationListener, InputProcessor
      * This function checks for any collision and updates the world accordingly
      */
     private void hit(){
-        if (currentSector() == null) return; //no collisions outside of the warzone
+        if (currentSector() == null || currentSector().mirror != null) return; //no collisions outside of the warzone
         //player to star collision
         collisionPlayerStar();
 
@@ -504,12 +578,12 @@ public class TheGame implements ApplicationListener, InputProcessor
 	    for(Projectile p : projectiles)
 	    {
 		    Sector s = getSectorForAbsoluteCoordinates(p.position.x,p.position.y,p.position.z);
-            if (s == null) continue;
+            if (s == null || s.mirror != null) continue;
 		    for(Star star : s.stars)
 		    {
 			    Vector3D diff = Vector3D.difference(p.position, star.pos);
 			    float len = diff.length();
-			    if (len < 15){
+			    if (len < 9){
 				    diff.normalize();
 				    star.team = p.team;
 				    removeList.add(p);
@@ -531,7 +605,7 @@ public class TheGame implements ApplicationListener, InputProcessor
 		    {
 			    Vector3D diff = Vector3D.difference(p.position, star.pos);
 			    float len = diff.length();
-			    if (len < 15){
+			    if (len < 9){
 				    diff.normalize();
 				    star.team = p.team;
 				    removeNetworkList.add(p);
@@ -565,6 +639,7 @@ public class TheGame implements ApplicationListener, InputProcessor
     private void drawEnvironment() {
         drawSectors();
         drawProjectiles();
+        drawPlayers();
     }
 
     /**
@@ -609,6 +684,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         List<Integer> removables = new ArrayList<Integer>();
 
         for (Projectile p : projectiles){
+            extendPoint(p.position);
             if (!p.update()){
                 removables.add(projectiles.indexOf(p));
             }
@@ -675,8 +751,6 @@ public class TheGame implements ApplicationListener, InputProcessor
 
         drawEnvironment();
 
-        drawPlayers();
-
         p1.draw();
 
         //Write the text on the screen:
@@ -689,9 +763,7 @@ public class TheGame implements ApplicationListener, InputProcessor
         font.setColor(1f,1f,1f,1f);
         font.setScale(1,1);
         font.draw(this.spriteBatch, String.format("o"),-3,4);
-        font.draw(this.spriteBatch, String.format("Player position: (%.2f, %.2f, %.2f)",this.p1.eye.x, this.p1.eye.y, this.p1.eye.z), -400, -280);
         font.draw(this.spriteBatch, String.format("Current sector coordinates: (%d,%d,%d)", (int)p1.eye.x / sectorSize, (int)p1.eye.y / sectorSize, (int)p1.eye.z / sectorSize), -400, -300);
-        font.draw(this.spriteBatch, String.format("Current sector: %d", currentSectorIndex()), -400, -320);
         font.draw(this.spriteBatch, String.format("Frames per second: %d", Gdx.graphics.getFramesPerSecond()), -400, -340);
 
         font.setColor(0.6f,0.6f,1f,1f);
